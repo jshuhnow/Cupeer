@@ -48,17 +48,15 @@ class MainActivity : AppCompatActivity(), DomainObserver {
 
         for (permission in arrPermissions) {
             if (ContextCompat.checkSelfPermission(this,
-                    permission)
-            != PackageManager.PERMISSION_GRANTED) {
+                    permission) != PackageManager.PERMISSION_GRANTED) {
                 arrNeededPermissions.add(permission)
             }
         }
 
         return if (arrNeededPermissions.isNotEmpty()) {
-            // Permission is not granted
             ActivityCompat.requestPermissions(
                 this,
-                arrNeededPermissions.toArray() as Array<out String>,
+                arrNeededPermissions.toTypedArray(),
                 MULTIPLE_PERMISSIONS
             )
             false
@@ -77,14 +75,12 @@ class MainActivity : AppCompatActivity(), DomainObserver {
 
                 if (grantResults.isNotEmpty()) {
                     var permissionsDenied = ""
-                    for (permission in permissions) {
-                        if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    for (i in 0 until permissions.size) {
+                        val permission = permissions[i]
+                        if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                             permissionsDenied += "\n" + permission
                         }
-
                     }
-
-
                 } else {
                     // One of the permission has not been granted
                 }
