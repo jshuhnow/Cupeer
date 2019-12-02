@@ -15,7 +15,11 @@ class DataAccessLayer (
 
     fun unregister(observer: DomainObserver) = observers.remove(observer)
 
-    fun performLogin(name: String, age : Int, avatarId : Int, photoPath : String, bio : String,
+    fun performLogin(name: String,
+                     age : Int,
+                     avatarId : Int,
+                     photoPath : String,
+                     bio : String,
                      macAddress: MacAddress) {
         // TODO: Do login
         notify(AccountObserver::accountLoggedIn)
