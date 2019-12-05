@@ -3,4 +3,40 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="colorTransparent">#00FFFFFF</color>
+
+    <color name="gradientOne">#9FA9AD</color>
+    <color name="gradientMiddle">#E1F5FE</color>
+    <color name="gradientTwo">#E3F2FD</color>
+
+    <color name="colorStripeStart">#3EAABABD</color>
+    <color name="colorStripeEnd">#3EE1F5FE</color>
+
+
+    <color name="gradientStartActiveX">#FF1744</color>
+    <color name="gradientMiddleActiveX">#FF9100</color>
+    <color name="gradientEndActiveX">#FFC400</color>
+
+    <color name="colorStripeStartActiveX">#3EFF1744</color>
+    <color name="colorStripeEndActiveX">#41FF9100</color>
+
+
+
+    <color name="gradientStartActive">#29B6F6</color>
+    <color name="gradientMiddleActive">#26A69A</color>
+    <color name="gradientEndActive">#9CCC65</color>
+
+    <color name="colorStripeStartActive">#3E29B6F6</color>
+    <color name="colorStripeEndActive">#3C26A69A</color>
+
+
+    <color name="gradientOneX">#004E52</color>
+    <color name="gradientMiddleX">#00838F</color>
+    <color name="gradientTwoX">#0097A7</color>
+
+    <color name="colorStripeStartX">#3E004E52</color>
+    <color name="colorStripeEndX">#3C00838F</color>
+
+
 </resources>
