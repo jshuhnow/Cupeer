@@ -12,6 +12,7 @@ import com.example.cupid.view.utils.returnToMain
 
 
 //TODO deal with cancelation on partners side -> launchRejectedPopup
+
 //TODO handle incoming chat messages -> update adapter and ui
 
 class ChatActivity : AppCompatActivity() {
@@ -70,7 +71,6 @@ class ChatActivity : AppCompatActivity() {
     private fun setClickListeners(){
 
         button_chat_found.setOnClickListener{
-            // TODO? Wait for the other person to press "found" as well before closing the chat?
             returnToMain(this)
         }
 

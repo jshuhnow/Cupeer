@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), DomainObserver {
 
         main_button_discover.setOnClickListener {
 
-            // Maybe manage state from model?
+            // TODO start/stop discovery
             if(!discovering){
                 findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
                 stripe_layout.startAnimation(anim)
@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity(), DomainObserver {
                 /* Merge: Stop discovery process*/
             }
             discovering = !discovering
+
             updateGradientAnimation()
         }
 
@@ -121,14 +122,16 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         val discoverDialog = Dialog(this)
         discoverDialog.setContentView(R.layout.dialog_discovered)
 
-        // TODO dummy data
+        // TODO dummy data -> Fill in on connect
         val partnerAvatarId = 8
-        discoverDialog.image_discover_avatar.setImageResource(getAvatarFromId(this,partnerAvatarId))
+        val partnerName = "Bob"
 
+        discoverDialog.image_discover_avatar.setImageResource(getAvatarFromId(this,partnerAvatarId))
+        discoverDialog.text_discover_name.text = partnerName
 
         discoverDialog.button_discover_connect.setOnClickListener{
-
-            /*check if partner has already answered */
+            // Agreement to go further
+            /*TODO check if partner has already answered */
 
             launchWaitingPopup(it)
             discoverDialog.dismiss()
@@ -154,7 +157,7 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         waitingDialog.button_waiting_close.setOnClickListener{
             waitingDialog.dismiss()
 
-            /*normally just dismiss, this is for testing purposes*/
+            /* TODO normally just dismiss, this is for testing purposes*/
 
             val myIntent = Intent(this, QuizQuestionsActivity::class.java)
             //myIntent.putExtra("key", value) //Optional parameters

@@ -9,6 +9,7 @@ import android.view.View
 import com.example.cupid.R
 import com.example.cupid.view.MainActivity
 import kotlinx.android.synthetic.main.dialog_discovered.*
+import kotlinx.android.synthetic.main.dialog_rejection.*
 
 fun returnToMain(activity: Activity){
     val intents = Intent(activity, MainActivity::class.java)
@@ -23,10 +24,10 @@ fun returnToMain(activity: Activity){
 
 fun launchRejectedPopup(activity: Activity){
     val rejectionDialog = Dialog(activity)
-    rejectionDialog.setContentView(R.layout.dialog_discovered)
+    rejectionDialog.setContentView(R.layout.dialog_rejection)
 
 
-    rejectionDialog.button_discover_close.setOnClickListener{
+    rejectionDialog.button_rejection_close.setOnClickListener{
         rejectionDialog.dismiss()
     }
 

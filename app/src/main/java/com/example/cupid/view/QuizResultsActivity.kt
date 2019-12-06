@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cupid.R
 import com.example.cupid.view.adapters.ResultListAdapter
 import com.example.cupid.view.data.ResultUI
+import com.example.cupid.view.utils.launchRejectedPopup
 import com.example.cupid.view.utils.returnToMain
 import kotlinx.android.synthetic.main.activity_quiz_results.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
@@ -28,8 +29,8 @@ class QuizResultsActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
 
-
-        // TODO change dummy data
+        // Todo get data from repository
+        // Todo change the data into the UI format shown below
 
         val results: ArrayList<ResultUI> = arrayListOf()
 

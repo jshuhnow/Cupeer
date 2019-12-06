@@ -89,7 +89,7 @@ class QuizQuestionsActivity : AppCompatActivity(), CardStackListener {
         waitingDialog.button_waiting_close.setOnClickListener{
             waitingDialog.dismiss()
 
-            /*normally just dismiss, this is for testing purposes*/
+            /*TODO normally just dismiss, this is for testing purposes*/
 
             val myIntent = Intent(this, QuizResultsActivity::class.java)
             //myIntent.putExtra("key", value) //Optional parameters
