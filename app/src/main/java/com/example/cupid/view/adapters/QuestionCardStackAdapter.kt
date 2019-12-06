@@ -1,17 +1,12 @@
-package com.example.cupid.view
+package com.example.cupid.view.adapters
 
 import android.app.Activity
-import android.content.Context
-import android.util.Log
 import com.example.cupid.R
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.cupid.model.domain.Question
 import com.example.cupid.view.data.QuestionUI
 import com.yuyakaido.android.cardstackview.CardStackView
 import kotlinx.android.synthetic.main.item_question.view.*
@@ -25,7 +20,13 @@ class QuestionCardStackAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(inflater.inflate(R.layout.item_question, parent, false))
+        return ViewHolder(
+            inflater.inflate(
+                R.layout.item_question,
+                parent,
+                false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -53,14 +54,6 @@ class QuestionCardStackAdapter(
 
     override fun getItemCount(): Int {
         return questions.size
-    }
-
-    fun setQuestions(questions: List<QuestionUI>) {
-        this.questions = questions
-    }
-
-    fun getQuestions(): List<QuestionUI> {
-        return questions
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

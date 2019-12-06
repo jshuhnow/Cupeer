@@ -10,7 +10,9 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cupid.R
+import com.example.cupid.view.adapters.ResultListAdapter
 import com.example.cupid.view.data.ResultUI
+import com.example.cupid.view.utils.returnToMain
 import kotlinx.android.synthetic.main.activity_quiz_results.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 
@@ -18,20 +20,16 @@ class QuizResultsActivity : AppCompatActivity() {
 
     private var resultListAdapter : ResultListAdapter? = null
     private var layoutManager : RecyclerView.LayoutManager? = null
+    private var resultRecyclerView : RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_results)
-        val resultRecyclerView = result_recycler_view
-
-        layoutManager = LinearLayoutManager(this)
-        (layoutManager as LinearLayoutManager).orientation = LinearLayoutManager.VERTICAL
-
-        resultRecyclerView.layoutManager = layoutManager
-
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-        // TODO dummy data CHANGE THIS
+
+
+        // TODO change dummy data
 
         val results: ArrayList<ResultUI> = arrayListOf()
 
@@ -41,7 +39,9 @@ class QuizResultsActivity : AppCompatActivity() {
                 answerYou = "AAAAA",
                 answerPartner = "BBBBB",
                 nameYou = "You",
-                namePartner = "Bob"
+                namePartner = "Bob",
+                iconIdPartner = 2,
+                iconIdYou = 3
             )
         )
 
@@ -51,7 +51,9 @@ class QuizResultsActivity : AppCompatActivity() {
                 answerYou = "AAAAA",
                 answerPartner = "BBBBB",
                 nameYou = "You",
-                namePartner = "Bob"
+                namePartner = "Bob",
+                iconIdPartner = 2,
+                iconIdYou = 3
             )
         )
 
@@ -61,21 +63,41 @@ class QuizResultsActivity : AppCompatActivity() {
                 answerYou = "AAAAA",
                 answerPartner = "BBBBB",
                 nameYou = "You",
-                namePartner = "Bob"
+                namePartner = "Bob",
+                iconIdPartner = 2,
+                iconIdYou = 3
             )
         )
+
+
+        /* RecyclerView configuration */
+
+        resultRecyclerView = result_recycler_view
+
+        layoutManager = LinearLayoutManager(this)
+        (layoutManager as LinearLayoutManager).orientation = LinearLayoutManager.VERTICAL
+        resultRecyclerView!!.layoutManager = layoutManager
+
         resultListAdapter = ResultListAdapter(results, this)
-        resultRecyclerView.adapter = resultListAdapter
+        resultRecyclerView!!.adapter = resultListAdapter
 
 
+        setClickListeners()
+
+    }
+
+    private fun setClickListeners(){
         button_result_connect.setOnClickListener{
             launchWaitingPopup(it)
         }
 
         button_result_cancel.setOnClickListener{
-            //TODO
+            //TODO send cancel message to other person
+
+            returnToMain(this)
         }
     }
+
 
     private fun launchWaitingPopup(v: View){
 
@@ -86,7 +108,7 @@ class QuizResultsActivity : AppCompatActivity() {
         waitingDialog.button_waiting_close.setOnClickListener{
             waitingDialog.dismiss()
 
-            /*normally just dismiss, this is for testing purposes -> REMOVE EXIT BUTTON*/
+            /*TODO normally just dismiss, this is for testing purposes -> move this */
 
             val myIntent = Intent(this, ChatActivity::class.java)
             //myIntent.putExtra("key", value) //Optional parameters

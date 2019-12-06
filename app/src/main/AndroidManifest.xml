@@ -10,7 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".view.AboutActivity"></activity>
-        <activity android:name=".view.InstructionsActivity" />
         <activity
             android:name=".view.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -22,7 +21,6 @@
         </activity>
         <activity android:name=".view.QuizResultsActivity" />
         <activity android:name=".view.QuizQuestionsActivity" />
-        <activity android:name=".view.InitialDataEntryActivity" />
         <activity
             android:name=".view.SettingsActivity"
             android:label="@string/title_activity_settings"

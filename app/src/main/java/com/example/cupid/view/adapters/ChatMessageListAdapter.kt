@@ -1,8 +1,6 @@
-package com.example.cupid.view
+package com.example.cupid.view.adapters
 
-import android.text.format.DateUtils.formatDateTime
 import android.content.Context
-import android.util.Log
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -11,24 +9,24 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.example.cupid.R
 import com.example.cupid.view.data.MessageUI
+import com.example.cupid.view.utils.getAvatarFromId
 
 
-class MessageListAdapter(
-    private val mContext: Context,
-    private val mMessageList: List<MessageUI>
+class ChatMessageListAdapter(
+    private val context : Context,
+    private val messages: List<MessageUI>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val SENT = 1
     private val RECEIVED = 2
 
     override fun getItemCount(): Int {
-        Log.d("Test","kjhjh")
-        return mMessageList.size
+        return messages.size
     }
 
 
     override fun getItemViewType(position: Int): Int {
-        val message = mMessageList[position]
+        val message = messages[position]
         return if (message.sentByMe) SENT else RECEIVED
     }
 
@@ -48,7 +46,7 @@ class MessageListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val message = mMessageList[position]
+        val message = messages[position]
 
         when (holder.itemViewType) {
             SENT -> (holder as SentMessageHolder).bind(message)
@@ -83,12 +81,14 @@ class MessageListAdapter(
             messageText = itemView.findViewById(R.id.text_message_body)
             timeText = itemView.findViewById(R.id.text_message_time)
             nameText = itemView.findViewById(R.id.text_message_name)
-            profileImage = itemView.findViewById(R.id.image_message_profile) as ImageView
+            profileImage = itemView.findViewById(R.id.image_message_profile)
         }
 
         internal fun bind(message: MessageUI) {
             messageText.text = message.payload
             nameText.text = message.name
+            timeText.text = ""
+            profileImage.setImageResource(getAvatarFromId(context,message.iconId))
         }
     }
 }

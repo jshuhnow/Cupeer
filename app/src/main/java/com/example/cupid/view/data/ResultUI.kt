@@ -5,7 +5,7 @@ data class ResultUI (
     val answerYou : String,
     val answerPartner : String,
     val nameYou : String,
-    val namePartner : String
-    //val iconYou : ImageView = view.image_result_you
-    //val iconPartner : ImageView = view.image_result_partner
+    val namePartner : String,
+    val iconIdYou : Int,
+    val iconIdPartner : Int
 )

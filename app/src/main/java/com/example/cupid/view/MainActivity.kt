@@ -17,9 +17,11 @@ import android.view.Gravity
 import androidx.drawerlayout.widget.DrawerLayout
 import android.graphics.drawable.ColorDrawable
 import android.widget.Button
+import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
-
+import kotlinx.android.synthetic.main.drawer_navigation_header.*
+import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 
 class MainActivity : AppCompatActivity(), DomainObserver {
@@ -32,6 +34,18 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+
+
+
+        // TODO dummy data
+        var avatarId = 2
+        var name = "Steven"
+
+
+        main_button_menu.setImageResource(getAvatarFromId(this,avatarId))
+        nav_menu.getHeaderView(0).layout_drawer_navigation_header.imageView.setImageResource(
+            getAvatarFromId(this,avatarId))
+        nav_menu.getHeaderView(0).layout_drawer_navigation_header.textView.text = name
 
         updateGradientAnimation()
         setClickListeners()
@@ -72,16 +86,13 @@ class MainActivity : AppCompatActivity(), DomainObserver {
             updateGradientAnimation()
         }
 
+
         main_button_menu.setOnClickListener{
             drawerLayout.openDrawer(Gravity.LEFT)
         }
 
         main_button_debug.setOnClickListener{
             launchDiscoveredPopup(it)
-
-            //val myIntent = Intent(this, DiscoveredPopup::class.java)
-            //myIntent.putExtra("key", value) //Optional parameters
-            //this.startActivity(myIntent)
         }
 
         nav_menu.menu.findItem(R.id.nav_settings).setOnMenuItemClickListener {
@@ -91,12 +102,6 @@ class MainActivity : AppCompatActivity(), DomainObserver {
 
         }
 
-        nav_menu.menu.findItem(R.id.nav_how_to).setOnMenuItemClickListener {
-            val myIntent = Intent(this, InstructionsActivity::class.java)
-            this.startActivity(myIntent)
-            true
-
-        }
 
         nav_menu.menu.findItem(R.id.nav_about).setOnMenuItemClickListener {
             val myIntent = Intent(this, AboutActivity::class.java)
@@ -105,13 +110,20 @@ class MainActivity : AppCompatActivity(), DomainObserver {
 
         }
 
+
+
     }
+
 
     private fun launchDiscoveredPopup(v: View) {
 
 
         val discoverDialog = Dialog(this)
         discoverDialog.setContentView(R.layout.dialog_discovered)
+
+        // TODO dummy data
+        val partnerAvatarId = 8
+        discoverDialog.image_discover_avatar.setImageResource(getAvatarFromId(this,partnerAvatarId))
 
 
         discoverDialog.button_discover_connect.setOnClickListener{

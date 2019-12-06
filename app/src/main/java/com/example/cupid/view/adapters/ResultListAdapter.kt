@@ -1,6 +1,7 @@
-package com.example.cupid.view
+package com.example.cupid.view.adapters
 
 import android.app.Activity
+import android.content.Context
 import com.example.cupid.R
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cupid.view.data.ResultUI
-import kotlinx.android.synthetic.main.item_question.view.*
+import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.item_question_result.view.*
 
 
@@ -21,7 +22,13 @@ class ResultListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(inflater.inflate(R.layout.item_question_result, parent, false))
+        return ViewHolder(
+            inflater.inflate(
+                R.layout.item_question_result,
+                parent,
+                false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -32,8 +39,8 @@ class ResultListAdapter(
         holder.answerPartner.text  = result.answerPartner
         holder.nameYou.text  = result.nameYou
         holder.namePartner.text = result.namePartner
-        //iconYou  = view.image_result_you
-        //iconPartner = view.image_result_partner
+        holder.iconYou.setImageResource(getAvatarFromId(context as Context,result.iconIdYou))
+        holder.iconPartner.setImageResource(getAvatarFromId(context as Context,result.iconIdPartner))
 
 
         val bgColors = listOf(R.color.gradientEndActive, R.color.gradientMiddleActive, R.color.gradientStartActive)
