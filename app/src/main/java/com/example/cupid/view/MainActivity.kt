@@ -11,8 +11,6 @@ import android.view.animation.AnimationUtils
 import com.example.cupid.R
 import android.Manifest
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.cupid.model.ModelModule
@@ -27,7 +25,6 @@ import android.widget.Button
 import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
-import kotlinx.android.synthetic.main.drawer_navigation_header.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 
@@ -35,33 +32,29 @@ class MainActivity : AppCompatActivity(), DomainObserver {
 
     private val model = ModelModule.dataAccessLayer
     private var discovering = false
+    private val MULTIPLE_PERMISSIONS = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
         // TODO dummy data
         var avatarId = 2
         var name = "Steven"
 
 
-        main_button_menu.setImageResource(getAvatarFromId(this,avatarId))
+        main_button_menu.setImageResource(getAvatarFromId(this, avatarId))
         nav_menu.getHeaderView(0).layout_drawer_navigation_header.imageView.setImageResource(
-            getAvatarFromId(this,avatarId))
+            getAvatarFromId(this, avatarId)
+        )
         nav_menu.getHeaderView(0).layout_drawer_navigation_header.textView.text = name
 
         updateGradientAnimation()
         setClickListeners()
-
-    private val MULTIPLE_PERMISSIONS = 1
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(com.example.cupid.R.layout.activity_main)
-
         checkPermissions()
     }
+
 
     private fun updateGradientAnimation(){
         val backAnimation = main_layout.background as AnimationDrawable
