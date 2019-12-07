@@ -11,9 +11,25 @@ import android.view.animation.AnimationUtils
 import com.example.cupid.R
 import android.Manifest
 import android.content.pm.PackageManager
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.MacAddress
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.util.Log
+import androidx.annotation.Nullable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.cupid.controller.ControllerModule
+import com.example.cupid.controller.LoginController
+import com.example.cupid.controller.NearbyController
+import com.example.cupid.controller.ControllerModule.loginContrroller
+import com.example.cupid.controller.ControllerModule.nearbyController
 import com.example.cupid.model.ModelModule
+import com.example.cupid.model.observer.AccountObserver
 import com.example.cupid.model.observer.DomainObserver
 import kotlinx.android.synthetic.main.activity_main.*
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -26,12 +42,21 @@ import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.nearby.Nearby
+import com.google.android.gms.nearby.messages.Message
+import com.google.android.gms.nearby.messages.MessageListener
+import com.google.android.gms.nearby.messages.Strategy
+import kotlin.properties.Delegates
 
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks as ConnectionCallbacks
 
-class MainActivity : AppCompatActivity(), DomainObserver {
-
+class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
     private val model = ModelModule.dataAccessLayer
-    private var discovering = false
+
+    private val loginController = loginContrroller()
+    private val nearbyController = nearbyController()
+
     private val MULTIPLE_PERMISSIONS = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +78,10 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         updateGradientAnimation()
         setClickListeners()
         checkPermissions()
-    }
 
+        loginController.bind(this)
+        nearbyController.bind(this)
+    }
 
     private fun updateGradientAnimation(){
         val backAnimation = main_layout.background as AnimationDrawable
@@ -178,15 +205,17 @@ class MainActivity : AppCompatActivity(), DomainObserver {
     override fun onStart() {
         super.onStart()
         model.register(this)
+        nearbyController.onStart()
     }
 
     override fun onStop() {
+        nearbyController.onStop()
         super.onStop()
         model.unregister(this)
     }
 
 
-    private fun checkPermissions() : Boolean {
+    private fun checkPermissions(): Boolean {
         /* https://developer.android.com/training/permissions/requesting */
 
         // Here, thisActivity is the current activity
@@ -203,8 +232,11 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         val arrNeededPermissions = ArrayList<String>()
 
         for (permission in arrPermissions) {
-            if (ContextCompat.checkSelfPermission(this,
-                    permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 arrNeededPermissions.add(permission)
             }
         }
@@ -224,8 +256,10 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         /* https://developer.android.com/training/permissions/requesting END */
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
         when (requestCode) {
             MULTIPLE_PERMISSIONS -> {
 
@@ -253,4 +287,37 @@ class MainActivity : AppCompatActivity(), DomainObserver {
             }
         }
     }
+
+    override fun getName(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getAge(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getAvartarrId(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getPhotoPath(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getBio(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getMaccAddress(): MacAddress {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun accountLoggedIn() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun accountUnknown() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
+
