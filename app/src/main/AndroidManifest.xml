@@ -33,11 +33,12 @@
         <activity android:name=".view.MainActivity" />
 
         <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" 
             android:name="com.google.android.nearby.messages.API_KEY"
-            android:value="AIzaSyDRtgmnGcbBP_txY6GwFi7IeecTIewVIDM"
-        />
+            android:value="AIzaSyDRtgmnGcbBP_txY6GwFi7IeecTIewVIDM" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
     <!-- Required for Nearby Connections -->
