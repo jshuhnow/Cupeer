@@ -11,26 +11,13 @@ import android.view.animation.AnimationUtils
 import com.example.cupid.R
 import android.Manifest
 import android.content.pm.PackageManager
-import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.MacAddress
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.util.Log
-import androidx.annotation.Nullable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.cupid.controller.ControllerModule
-import com.example.cupid.controller.LoginController
-import com.example.cupid.controller.NearbyController
 import com.example.cupid.controller.ControllerModule.loginContrroller
 import com.example.cupid.controller.ControllerModule.nearbyController
 import com.example.cupid.model.ModelModule
 import com.example.cupid.model.observer.AccountObserver
-import com.example.cupid.model.observer.DomainObserver
 import kotlinx.android.synthetic.main.activity_main.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import android.graphics.Color
@@ -42,14 +29,6 @@ import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.nearby.Nearby
-import com.google.android.gms.nearby.messages.Message
-import com.google.android.gms.nearby.messages.MessageListener
-import com.google.android.gms.nearby.messages.Strategy
-import kotlin.properties.Delegates
-
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks as ConnectionCallbacks
 
 class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
     private val model = ModelModule.dataAccessLayer
