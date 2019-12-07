@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
 
     private val loginController = loginContrroller()
     private val nearbyController = nearbyController()
-
+    private var mDiscovering = false
     private val MULTIPLE_PERMISSIONS = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
         main_button_discover.setOnClickListener {
 
             // TODO start/stop discovery
-            if(!discovering){
+            if(!mDiscovering){
                 findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
                 stripe_layout.startAnimation(anim)
                 findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
 
                 /* Merge: Stop discovery process*/
             }
-            discovering = !discovering
+            mDiscovering = !mDiscovering
 
             updateGradientAnimation()
         }
