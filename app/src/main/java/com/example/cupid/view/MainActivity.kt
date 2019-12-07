@@ -15,7 +15,6 @@ import android.net.MacAddress
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.cupid.controller.ControllerModule.loginContrroller
-import com.example.cupid.controller.ControllerModule.nearbyController
 import com.example.cupid.model.ModelModule
 import com.example.cupid.model.observer.AccountObserver
 import kotlinx.android.synthetic.main.activity_main.*
@@ -34,7 +33,6 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
     private val model = ModelModule.dataAccessLayer
 
     private val loginController = loginContrroller()
-    private val nearbyController = nearbyController()
     private var mDiscovering = false
     private val MULTIPLE_PERMISSIONS = 1
 
@@ -59,7 +57,6 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
         checkPermissions()
 
         loginController.bind(this)
-        nearbyController.bind(this)
     }
 
     private fun updateGradientAnimation(){
@@ -184,11 +181,11 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
     override fun onStart() {
         super.onStart()
         model.register(this)
-        nearbyController.onStart()
+        //nearbyController.onStart()
     }
 
     override fun onStop() {
-        nearbyController.onStop()
+        //nearbyController.onStop()
         super.onStop()
         model.unregister(this)
     }

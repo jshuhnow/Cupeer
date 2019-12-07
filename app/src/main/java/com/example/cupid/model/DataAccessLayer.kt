@@ -9,8 +9,7 @@ import com.example.cupid.model.repository.AccountRepository
 import com.example.cupid.model.repository.MessageRepository
 
 class DataAccessLayer (
-    private val accountRepository: AccountRepository,
-    private val messageRepository: MessageRepository
+    private val accountRepository: AccountRepository
 ) {
 
     private val observers = mutableListOf<DomainObserver>()

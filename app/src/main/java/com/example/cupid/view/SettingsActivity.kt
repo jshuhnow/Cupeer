@@ -14,21 +14,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private var name = ""
