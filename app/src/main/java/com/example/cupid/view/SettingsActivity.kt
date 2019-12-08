@@ -85,14 +85,12 @@ class SettingsActivity :
                mName = s.toString()
             }
         })
-
-
     }
 
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, arg3: Long) {
 
         val value = parent.getItemAtPosition(position).toString()
-        when (view.id){
+        when (parent.id){
             R.id.spinner_settings_icon -> {
                 mIconId = value.toInt()
             }
