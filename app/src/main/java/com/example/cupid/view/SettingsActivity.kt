@@ -8,26 +8,30 @@ import kotlinx.android.synthetic.main.settings_activity.*
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Display
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.example.cupid.controller.SettingsController
+import com.example.cupid.model.ModelModule
 
 
-class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+class SettingsActivity :
+    AppCompatActivity(), AdapterView.OnItemSelectedListener, SettingsView {
 
-    private var name = ""
-    private var iconId = 1
-    private var gender = ""
-    private var lookingFor = ""
+    private val model = ModelModule.dataAccessLayer
+    private val controller = SettingsController(model)
+
+    private var mName : String = ""
+    private var mIconId : Int = 0
+
+    private var mGender = ""
+    private var mLookingFor = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
-
-        // TODO dummy values read in from model
-        name = ""
-
 
         setClickListeners()
     }
@@ -35,15 +39,10 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
     private fun setClickListeners(){
 
         button_settings_close.setOnClickListener {
-
-            //TODO update values in  model
-
+            writeUserInformation()
             finish()
         }
-
-
         // Repeted, refactor this later
-
         val adapterIcon = ArrayAdapter.createFromResource(
             this,
             R.array.settings_icons, android.R.layout.simple_spinner_item)
@@ -83,7 +82,7 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
                 s: CharSequence, start: Int,
                 before: Int, count: Int
             ) {
-               name = s.toString()
+               mName = s.toString()
             }
         })
 
@@ -95,19 +94,30 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         val value = parent.getItemAtPosition(position).toString()
         when (view.id){
             R.id.spinner_settings_icon -> {
-                iconId = value.toInt()
+                mIconId = value.toInt()
             }
             R.id.spinner_settings_gender -> {
-                gender = value
+                mGender = value
             }
             R.id.spinner_settings_looking_for -> {
-                lookingFor = value
+                mLookingFor = value
             }
             else -> {}
         }
+
     }
 
     override fun onNothingSelected(parent: AdapterView<*>) {
 
+    }
+
+    override fun readUserInformation() {
+        val res = controller.readUserInformation()
+        mIconId = res.first
+        mName = res.second
+    }
+
+    override fun writeUserInformation() {
+        controller.writeUserInformation(mIconId, mName)
     }
 }
