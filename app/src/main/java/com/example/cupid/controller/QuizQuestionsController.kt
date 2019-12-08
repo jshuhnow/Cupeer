@@ -16,4 +16,7 @@ class QuizQuestionsController(
         view.showQuestions(model.getQuestions())
     }
 
+    fun chooseAnswer(questionId : Int, answerId : Int) {
+        // Access a model
+    }
 }
