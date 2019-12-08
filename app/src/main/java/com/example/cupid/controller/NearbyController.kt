@@ -26,6 +26,7 @@ class NearbyController (private val model: DataAccessLayer, context : Context){
     companion object {
         val TAG = "MainActivity"
         val NAMESPACE = "nearby-controller"
+
     }
 
     fun bind(nearbyView : NearbyView) {
@@ -48,6 +49,7 @@ class NearbyController (private val model: DataAccessLayer, context : Context){
             .addConnectionCallbacks(NearbyConnectionCallbacks())
             .addOnConnectionFailedListener(NearbyConnectionFailedListener())
             .build()
+
     }
 
     val strategy = Strategy.Builder()

@@ -28,6 +28,7 @@ class DataAccessLayer (
         observers.filterIsInstance<AccountObserver>().onEach { action(it) }
     }
 
+    fun getUserName() = accountRepository.userAccount!!.name
     fun getUserAccount() = accountRepository.userAccount
     fun getPartnerAccount() = accountRepository.partnerAccount
 
