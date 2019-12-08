@@ -7,7 +7,8 @@ data class Account (
     //val macAddr : MacAddress,
     val name : String = "",
     //val age : Int = 0,
-    val avatarId : Int = 0
+    val avatarId : Int = 0,
+    val answers : ArrayList<Answer>
     //val photoPath : String = "",
     //val bio : String = "",
     //val pub_key : String = "",
