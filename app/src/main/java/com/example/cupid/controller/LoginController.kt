@@ -11,14 +11,4 @@ class LoginController(private val model: DataAccessLayer) {
         view = loginView
     }
 
-    fun onLoginButtonClicked() {
-        model.performLogin(
-            view.getName(),
-            view.getAge(),
-            view.getAvartarrId(),
-            view.getPhotoPath(),
-            view.getBio(),
-            view.getMaccAddress()
-        )
-    }
 }

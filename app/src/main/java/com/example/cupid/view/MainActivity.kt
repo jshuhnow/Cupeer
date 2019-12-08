@@ -11,12 +11,9 @@ import android.view.animation.AnimationUtils
 import com.example.cupid.R
 import android.Manifest
 import android.content.pm.PackageManager
-import android.net.MacAddress
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.cupid.controller.ControllerModule.loginContrroller
 import com.example.cupid.model.ModelModule
-import com.example.cupid.model.observer.AccountObserver
 import kotlinx.android.synthetic.main.activity_main.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import android.graphics.Color
@@ -24,50 +21,50 @@ import android.view.Gravity
 import androidx.drawerlayout.widget.DrawerLayout
 import android.graphics.drawable.ColorDrawable
 import android.widget.Button
+import com.example.cupid.controller.MainController
 import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
-class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
+class MainActivity : AppCompatActivity(), MainView {
     private val model = ModelModule.dataAccessLayer
 
-    private val loginController = loginContrroller()
-    private var mDiscovering = false
+    private val mainController = MainController(model)
+
     private val MULTIPLE_PERMISSIONS = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-        // TODO dummy data
-        var avatarId = 2
-        var name = "Steven"
-
-
-        main_button_menu.setImageResource(getAvatarFromId(this, avatarId))
-        nav_menu.getHeaderView(0).layout_drawer_navigation_header.imageView.setImageResource(
-            getAvatarFromId(this, avatarId)
-        )
-        nav_menu.getHeaderView(0).layout_drawer_navigation_header.textView.text = name
-
-        updateGradientAnimation()
-        setClickListeners()
-        checkPermissions()
-
-        loginController.bind(this)
+        mainController.bind(this)
+        mainController.init()
     }
 
-    private fun updateGradientAnimation(){
+     override fun updateUserInfo(avatarId: Int, name : String) {
+        nav_menu.getHeaderView(0)
+            .layout_drawer_navigation_header
+            .imageView
+            .setImageResource(getAvatarFromId(this, avatarId)
+        )
+        nav_menu
+            .getHeaderView(0)
+            .layout_drawer_navigation_header
+            .textView.text = name
+         main_button_menu.setImageResource(getAvatarFromId(this, avatarId))
+     }
+
+    override fun updateGradientAnimation(){
         val backAnimation = main_layout.background as AnimationDrawable
         backAnimation.setEnterFadeDuration(10)
         backAnimation.setExitFadeDuration(3000)
         backAnimation.start()
     }
 
-    private fun setClickListeners(){
-
+    override fun updateClickListeners(mDiscovering: Boolean){
         val drawerLayout: DrawerLayout = drawer_layout
         val anim = AnimationUtils.loadAnimation(this, R.anim.stripe_anim)
 
@@ -81,117 +78,103 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
 
                 /* Merge: Start discovery process*/
 
-            }else{
+            } else{
                 findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_inactive)
                 stripe_layout.clearAnimation()
                 findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation)
 
                 /* Merge: Stop discovery process*/
             }
-            mDiscovering = !mDiscovering
-
             updateGradientAnimation()
         }
-
 
         main_button_menu.setOnClickListener{
             drawerLayout.openDrawer(Gravity.LEFT)
         }
 
         main_button_debug.setOnClickListener{
-            launchDiscoveredPopup(it)
+            // TODO: NearBy Conncection
+            //mainController.clientDiscovered()
+            launchDiscoveredPopup(2, "Bob")
         }
 
-        nav_menu.menu.findItem(R.id.nav_settings).setOnMenuItemClickListener {
+        nav_menu.menu.findItem(R.id.nav_settings)
+            .setOnMenuItemClickListener {
             val myIntent = Intent(this, SettingsActivity::class.java)
             this.startActivity(myIntent)
             true
-
         }
 
 
-        nav_menu.menu.findItem(R.id.nav_about).setOnMenuItemClickListener {
+        nav_menu.menu.findItem(R.id.nav_about)
+            .setOnMenuItemClickListener {
             val myIntent = Intent(this, AboutActivity::class.java)
             this.startActivity(myIntent)
             true
-
         }
-
-
-
     }
 
 
-    private fun launchDiscoveredPopup(v: View) {
+    override fun launchDiscoveredPopup(partnerAvatarId: Int,
+                                       partnerName : String) {
+        with(Dialog(this)) {
+            setContentView(R.layout.dialog_discovered)
 
+            image_discover_avatar
+            .setImageResource(getAvatarFromId(this@MainActivity, partnerAvatarId))
 
-        val discoverDialog = Dialog(this)
-        discoverDialog.setContentView(R.layout.dialog_discovered)
+            text_discover_name.text = partnerName
 
-        // TODO dummy data -> Fill in on connect
-        val partnerAvatarId = 8
-        val partnerName = "Bob"
+            button_discover_connect.setOnClickListener{
+                // Agreement to go further
+                /*TODO check if partner has already answered */
+                launchWaitingPopup()
+                this.dismiss()
+            }
 
-        discoverDialog.image_discover_avatar.setImageResource(getAvatarFromId(this,partnerAvatarId))
-        discoverDialog.text_discover_name.text = partnerName
+            button_discover_close.setOnClickListener{
+                this.dismiss()
+            }
 
-        discoverDialog.button_discover_connect.setOnClickListener{
-            // Agreement to go further
-            /*TODO check if partner has already answered */
-
-            launchWaitingPopup(it)
-            discoverDialog.dismiss()
+            window!!.attributes.windowAnimations = R.style.DialogAnimation
+            window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            show()
         }
-
-        discoverDialog.button_discover_close.setOnClickListener{
-            discoverDialog.dismiss()
-        }
-
-
-        discoverDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        discoverDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        discoverDialog.show()
-
     }
 
-    private fun launchWaitingPopup(v: View){
-
-        val waitingDialog = Dialog(this)
-        waitingDialog.setContentView(R.layout.dialog_waiting)
-
-
-        waitingDialog.button_waiting_close.setOnClickListener{
-            waitingDialog.dismiss()
-
-            /* TODO normally just dismiss, this is for testing purposes*/
-
-            val myIntent = Intent(this, QuizQuestionsActivity::class.java)
-            //myIntent.putExtra("key", value) //Optional parameters
-            this.startActivity(myIntent)
-            /**/
+    override fun launchWaitingPopup(){
+        with(Dialog(this)) {
+            setContentView(R.layout.dialog_waiting)
+            button_waiting_close.setOnClickListener{
+                this.dismiss()
+                /* TODO normally just dismiss, this is for testing purposes*/
+                val myIntent = Intent(this@MainActivity,
+                    QuizQuestionsActivity::class.java)
+                //myIntent.putExtra("key", value) //Optional parameters
+                super.startActivity(myIntent)
+                /**/
+            }
+            window!!.attributes.windowAnimations = R.style.DialogAnimation
+            window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            show()
         }
-
-
-        waitingDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        waitingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        waitingDialog.show()
     }
 
 
     override fun onStart() {
         super.onStart()
-        model.register(this)
+        //model.register()
         //nearbyController.onStart()
     }
 
     override fun onStop() {
         //nearbyController.onStop()
         super.onStop()
-        model.unregister(this)
+        //model.unregister(this)
     }
 
 
-    private fun checkPermissions(): Boolean {
+    override fun checkPermissions(): Boolean {
         /* https://developer.android.com/training/permissions/requesting */
 
         // Here, thisActivity is the current activity
@@ -264,36 +247,5 @@ class MainActivity : AppCompatActivity(), LoginView, AccountObserver {
         }
     }
 
-    override fun getName(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getAge(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getAvartarrId(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getPhotoPath(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getBio(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getMaccAddress(): MacAddress {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun accountLoggedIn() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun accountUnknown() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }
 

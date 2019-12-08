@@ -14,7 +14,11 @@ import com.yuyakaido.android.cardstackview.*
 import kotlinx.android.synthetic.main.activity_quiz_questions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 
-class QuizQuestionsActivity : AppCompatActivity(), CardStackListener {
+class QuizQuestionsActivity :
+    AppCompatActivity(),
+    CardStackListener,
+    QuizQuestionsView
+{
 
     private var questionCardStackAdapter : QuestionCardStackAdapter? = null
     private var layoutManager : CardStackLayoutManager? = null
@@ -55,9 +59,7 @@ class QuizQuestionsActivity : AppCompatActivity(), CardStackListener {
         ))
 
 
-
         /* RecyclerView configuration */
-
         cardStackView = quiz_card_stack_view
 
         layoutManager = CardStackLayoutManager(this,this)
@@ -69,39 +71,37 @@ class QuizQuestionsActivity : AppCompatActivity(), CardStackListener {
         questionCardStackAdapter =
             QuestionCardStackAdapter(questions, cardStackView, this)
         cardStackView!!.adapter = questionCardStackAdapter
-
-
     }
 
 
     override fun onCardDisappeared(view: View, position: Int) {
         if(layoutManager!!.topPosition == (questions.size-1)){
-            launchWaitingPopup(view)
+            launchWaitingPopup()
         }
     }
 
-    private fun launchWaitingPopup(v: View){
+    private fun launchWaitingPopup(){
 
-        val waitingDialog = Dialog(this)
-        waitingDialog.setContentView(R.layout.dialog_waiting)
+        with( Dialog(this)) {
+            setContentView(R.layout.dialog_waiting)
+            button_waiting_close.setOnClickListener{
+                this.dismiss()
 
+                /*TODO normally just dismiss, this is for testing purposes*/
 
-        waitingDialog.button_waiting_close.setOnClickListener{
-            waitingDialog.dismiss()
+                val myIntent = Intent(
+                    this@QuizQuestionsActivity,
+                    QuizResultsActivity::class.java
+                )
 
-            /*TODO normally just dismiss, this is for testing purposes*/
-
-            val myIntent = Intent(this, QuizResultsActivity::class.java)
-            //myIntent.putExtra("key", value) //Optional parameters
-            this.startActivity(myIntent)
-            /**/
+                //myIntent.putExtra("key", value) //Optional parameters
+                this@QuizQuestionsActivity.startActivity(myIntent)
+                /**/
+            }
+            window!!.attributes.windowAnimations = R.style.DialogAnimation
+            window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            show()
         }
-
-
-
-        waitingDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        waitingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        waitingDialog.show()
     }
 
     override fun onCardDragging(direction: Direction, ratio: Float) {}
