@@ -1,5 +1,6 @@
 package com.example.cupid.view
 
+
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.drawable.AnimationDrawable
@@ -8,6 +9,12 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils
 import com.example.cupid.R
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.cupid.model.ModelModule
 import com.example.cupid.model.observer.DomainObserver
 import kotlinx.android.synthetic.main.activity_main.*
@@ -29,13 +36,10 @@ class MainActivity : AppCompatActivity(), DomainObserver {
     private val model = ModelModule.dataAccessLayer
     private var discovering = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-
-
 
         // TODO dummy data
         var avatarId = 2
@@ -50,7 +54,13 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         updateGradientAnimation()
         setClickListeners()
 
+    private val MULTIPLE_PERMISSIONS = 1
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(com.example.cupid.R.layout.activity_main)
+
+        checkPermissions()
     }
 
     private fun updateGradientAnimation(){
@@ -182,4 +192,72 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         model.unregister(this)
     }
 
+
+    private fun checkPermissions() : Boolean {
+        /* https://developer.android.com/training/permissions/requesting */
+
+        // Here, thisActivity is the current activity
+        val arrPermissions = arrayOf(
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+
+        val arrNeededPermissions = ArrayList<String>()
+
+        for (permission in arrPermissions) {
+            if (ContextCompat.checkSelfPermission(this,
+                    permission) != PackageManager.PERMISSION_GRANTED) {
+                arrNeededPermissions.add(permission)
+            }
+        }
+
+        return if (arrNeededPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrNeededPermissions.toTypedArray(),
+                MULTIPLE_PERMISSIONS
+            )
+            false
+        } else {
+            // Permission has already been granted
+            true
+        }
+
+        /* https://developer.android.com/training/permissions/requesting END */
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            MULTIPLE_PERMISSIONS -> {
+
+                if (grantResults.isNotEmpty()) {
+                    var permissionsDenied = ""
+                    for (i in 0 until permissions.size) {
+                        val permission = permissions[i]
+                        if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                            permissionsDenied += "\n" + permission
+                        }
+                    }
+                } else {
+                    // One of the permission has not been granted
+                }
+
+                // TODO: update view
+
+                return
+            }
+
+            // Add other 'when' lines to check for other
+            // permissions this app might request.
+            else -> {
+                // Ignore all other requests.
+            }
+        }
+    }
 }
