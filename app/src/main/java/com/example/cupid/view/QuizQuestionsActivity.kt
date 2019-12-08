@@ -81,30 +81,14 @@ class QuizQuestionsActivity :
 
     override fun showQuestions(questions : ArrayList<Question>?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        mQuestions.add(QuestionUI (
-            questionText = "You win a lottery! What do you do with the money?",
-            choices = arrayListOf(
-                "Spend it now!",
-                "Better save it.",
-                "Give it away.",
-                "")
-        ))
+        mQuestions.clear()
+        for (question in questions!!) {
+            mQuestions.add(QuestionUI(
+                questionText = question.questionText,
+                choices = question.choices
+            ))
+        }
 
-        mQuestions.add(QuestionUI (
-            questionText = "Question2",
-            choices = arrayListOf(
-                "A",
-                "B",
-                "C",
-                "D")
-        ))
-
-        mQuestions.add(QuestionUI (
-            questionText = "Question3",
-            choices = arrayListOf("A","B","C","D")
-        ))
-
-        // TODO replace dummy data
         /* RecyclerView configuration */
         cardStackView = quiz_card_stack_view
 
@@ -114,8 +98,7 @@ class QuizQuestionsActivity :
         layoutManager!!.setSwipeThreshold(1.0f)
         cardStackView!!.layoutManager = layoutManager
 
-        questionCardStackAdapter =
-            QuestionCardStackAdapter(mQuestions, cardStackView, this)
+        questionCardStackAdapter = QuestionCardStackAdapter(mQuestions, cardStackView, this)
         cardStackView!!.adapter = questionCardStackAdapter
     }
 }

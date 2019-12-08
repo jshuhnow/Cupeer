@@ -2,6 +2,7 @@ package com.example.cupid.model
 
 import android.net.MacAddress
 import com.example.cupid.model.domain.Account
+import com.example.cupid.model.domain.Answer
 import com.example.cupid.model.domain.Message
 import com.example.cupid.model.domain.Question
 import com.example.cupid.model.observer.AccountObserver
@@ -42,12 +43,20 @@ class DataAccessLayer (
         notify(AccountObserver::partnerFound)
     }
 
+    fun updateUserAnswer(questionId : Int, answerId : Int) {
+        accountRepository.userAccount!!.answers.add(Answer(questionId, answerId))
+    }
 
     fun getQuestions() = questionRepository.questions
 
-    fun setQuestions(questions : ArrayList<Question>?) {
+    fun addQuestions(questionText : String, choices : ArrayList<String>) {
+        questionRepository.questions.add(Question(
+            questionText = questionText,
+            choices = choices,
+            questionId = questionRepository.questions.size
+        ))
+    }
+    fun setQuestions(questions : ArrayList<Question>) {
         questionRepository.questions = questions
     }
-
-
 }

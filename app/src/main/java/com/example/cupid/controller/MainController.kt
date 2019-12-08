@@ -12,6 +12,39 @@ class MainController(private val model: DataAccessLayer) {
         view = mainView
     }
 
+    fun dataSetup() {
+        model.addQuestions(
+            "You win a lottery! What do you do with the money?",
+            arrayListOf(
+                "Spend it now!",
+                "Better save it.",
+                "Give it away.",
+                ""
+            )
+        )
+        model.addQuestions(
+            "Q2",
+            arrayListOf(
+                "A",
+                "B",
+                "C",
+                "D"
+            )
+        )
+        model.addQuestions(
+            "Q3",
+            arrayListOf(
+                "A",
+                "B",
+                "C",
+                "D"
+            )
+        )
+
+
+    }
+
+
     fun init() {
         view.checkPermissions()
         view.updateGradientAnimation()
