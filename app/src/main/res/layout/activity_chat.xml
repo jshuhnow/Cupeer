@@ -9,17 +9,32 @@
     tools:context=".view.ChatActivity">
 
 
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/reyclerview_message_list"
+        android:layout_width="401dp"
+        android:layout_height="550dp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_chatbox"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintVertical_bias="0.981"></androidx.recyclerview.widget.RecyclerView>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="412dp"
         android:layout_height="79dp"
+        android:background="#FAFAFA"
         android:clipToPadding="false"
+        android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.000">
 
         <Button
             android:id="@+id/button_chat_found"
@@ -62,16 +77,6 @@
             app:layout_constraintVertical_bias="0.855" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/reyclerview_message_list"
-        android:layout_width="401dp"
-        android:layout_height="635dp"
-        app:layout_constraintBottom_toTopOf="@+id/layout_chatbox"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="0.978"></androidx.recyclerview.widget.RecyclerView>
 
     <View
         android:id="@+id/view"
