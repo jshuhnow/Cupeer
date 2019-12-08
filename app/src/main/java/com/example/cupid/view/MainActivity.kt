@@ -29,8 +29,7 @@ import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 class MainActivity : AppCompatActivity(), MainView {
     private val model = ModelModule.dataAccessLayer
-
-    private val mainController = MainController(model)
+    private val controller = MainController(model)
 
     private val MULTIPLE_PERMISSIONS = 1
 
@@ -40,8 +39,8 @@ class MainActivity : AppCompatActivity(), MainView {
 
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-        mainController.bind(this)
-        mainController.init()
+        controller.bind(this)
+        controller.init()
     }
 
      override fun updateUserInfo(avatarId: Int, name : String) {
