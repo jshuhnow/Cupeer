@@ -1,32 +1,15 @@
 package com.example.cupid.view
 
 import android.os.Bundle
-import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cupid.R
 import kotlinx.android.synthetic.main.settings_activity.*
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import com.example.cupid.view.utils.getAvatarFromId
 
 
 class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -43,6 +26,9 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         // TODO dummy values read in from model
         name = ""
 
+
+        iconId = 11
+        image_settings_avatar.setImageResource(getAvatarFromId(this,iconId))
 
         setClickListeners()
     }
@@ -108,9 +94,11 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, arg3: Long) {
 
         val value = parent.getItemAtPosition(position).toString()
-        when (view.id){
+        when (parent.id){
             R.id.spinner_settings_icon -> {
                 iconId = value.toInt()
+                image_settings_avatar.setImageResource(getAvatarFromId(this,iconId))
+
             }
             R.id.spinner_settings_gender -> {
                 gender = value
