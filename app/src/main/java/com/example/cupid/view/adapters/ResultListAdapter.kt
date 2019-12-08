@@ -42,7 +42,7 @@ class ResultListAdapter(
         holder.iconYou.setImageResource(getAvatarFromId(context as Context,result.iconIdYou))
         holder.iconPartner.setImageResource(getAvatarFromId(context as Context,result.iconIdPartner))
 
-
+        //val bgColors = listOf(R.drawable.question_result_bg1, R.color.gradientMiddleActive, R.color.gradientStartActive)
         val bgColors = listOf(R.color.gradientEndActive, R.color.gradientMiddleActive, R.color.gradientStartActive)
         holder.itemView.layout_result_question.background = context!!.getDrawable(bgColors[position])
     }
