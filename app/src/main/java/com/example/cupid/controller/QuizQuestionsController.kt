@@ -12,5 +12,8 @@ class QuizQuestionsController(
         view = quizQuestionsView
     }
 
+    fun init() {
+        view.showQuestions(model.getQuestions())
+    }
 
 }

@@ -8,7 +8,7 @@ data class Account (
     val name : String = "",
     //val age : Int = 0,
     val avatarId : Int = 0,
-    val answers : ArrayList<Answer>
+    val answers: ArrayList<Answer> = ArrayList<Answer>()
     //val photoPath : String = "",
     //val bio : String = "",
     //val pub_key : String = "",
