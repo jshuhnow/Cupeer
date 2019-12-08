@@ -80,7 +80,6 @@ class QuizQuestionsActivity :
     override fun onCardAppeared(view: View, position: Int) {}
 
     override fun showQuestions(questions : ArrayList<Question>?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         mQuestions.clear()
         for (question in questions!!) {
             mQuestions.add(QuestionUI(

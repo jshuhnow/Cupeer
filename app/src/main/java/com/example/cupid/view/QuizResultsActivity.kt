@@ -28,7 +28,6 @@ class QuizResultsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz_results)
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-
         // Todo get data from repository
         // Todo change the data into the UI format shown below
 
@@ -70,9 +69,7 @@ class QuizResultsActivity : AppCompatActivity() {
             )
         )
 
-
         /* RecyclerView configuration */
-
         resultRecyclerView = result_recycler_view
 
         layoutManager = LinearLayoutManager(this)
@@ -82,9 +79,7 @@ class QuizResultsActivity : AppCompatActivity() {
         resultListAdapter = ResultListAdapter(results, this)
         resultRecyclerView!!.adapter = resultListAdapter
 
-
         setClickListeners()
-
     }
 
     private fun setClickListeners(){

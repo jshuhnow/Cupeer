@@ -12,7 +12,7 @@ class MainController(private val model: DataAccessLayer) {
         view = mainView
     }
 
-    fun dataSetup() {
+    private fun dataSetup() {
         model.addQuestions(
             "You win a lottery! What do you do with the money?",
             arrayListOf(
@@ -40,13 +40,17 @@ class MainController(private val model: DataAccessLayer) {
                 "D"
             )
         )
-
-
+        model.updateUserAccount(0, "Alice")
     }
-
+    fun updateUserInfo() {
+        view.updateUserInfo(model.getUserAccount()!!.avatarId, model.getUserAccount()!!.name)
+    }
 
     fun init() {
         view.checkPermissions()
+
+        dataSetup()
+        updateUserInfo()
         view.updateGradientAnimation()
         view.updateClickListeners(mDiscovering)
 

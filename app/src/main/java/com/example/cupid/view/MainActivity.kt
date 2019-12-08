@@ -162,6 +162,8 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun onStart() {
         super.onStart()
+        controller.updateUserInfo()
+
         //model.register()
         //nearbyController.onStart()
     }
