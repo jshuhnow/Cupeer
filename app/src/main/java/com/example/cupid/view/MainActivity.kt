@@ -193,7 +193,7 @@ class MainActivity() :
         if (waitingDialog != null)
             waitingDialog!!.dismiss()
 
-        val DEV = true
+        val DEV = false
 
         if (DEV) {
             val myIntent = Intent(
