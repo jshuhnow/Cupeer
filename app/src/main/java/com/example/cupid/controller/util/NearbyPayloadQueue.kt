@@ -43,13 +43,15 @@ class MyPayloadQueue {
     }
 
     fun dequeue(queueObserver: QueueObserver) : NearbyPayload? {
+        var res : NearbyPayload? = null
         lock.lock()
         if (mMessageQueue.isEmpty()) {
             this.queueObserver = queueObserver
-            return null
+            res = null
         } else {
-            return mMessageQueue.dequeue()
+            res = mMessageQueue.dequeue()
         }
         lock.unlock()
+        return res
     }
 }
