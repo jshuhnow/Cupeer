@@ -73,7 +73,7 @@ class DataAccessLayer (
         questionRepository.questions = questions
     }
 
-    fun getMessages() : ArrayList<Message>?{
+    fun getMessages() : ArrayList<Message> {
         return messageRepository.messages // TODO
     }
 
