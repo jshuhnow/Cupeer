@@ -1,48 +1,80 @@
 package com.example.cupid.view
 
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.animation.AnimationUtils
-import com.example.cupid.R
 import android.Manifest
 import android.content.pm.PackageManager
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.cupid.model.ModelModule
-import com.example.cupid.model.observer.DomainObserver
-import kotlinx.android.synthetic.main.activity_main.*
-import androidx.constraintlayout.widget.ConstraintLayout
-import android.graphics.Color
-import android.view.Gravity
 import androidx.drawerlayout.widget.DrawerLayout
-import android.graphics.drawable.ColorDrawable
-import android.widget.Button
+import com.example.cupid.R
+import com.example.cupid.controller.ConnectionService
+import com.example.cupid.controller.MainController
+import com.example.cupid.model.ModelModule
+import com.example.cupid.model.observer.GoogleApiClientListener
+import com.example.cupid.model.observer.NearbyAdvertisingListener
+import com.example.cupid.model.observer.NearbyDiscoveringListener
 import com.example.cupid.view.utils.getAvatarFromId
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.nearby.Nearby
+import com.google.android.gms.nearby.connection.*
+import com.google.android.gms.nearby.connection.Strategy.P2P_POINT_TO_POINT
+import com.google.android.material.circularreveal.CircularRevealHelper.STRATEGY
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
-import kotlinx.android.synthetic.main.drawer_navigation_header.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 
-class MainActivity : AppCompatActivity(), DomainObserver {
+class MainActivity :
+    ConnectionsActivity(),
+    MainView,
+    GoogleApiClient.ConnectionCallbacks,
+    GoogleApiClient.OnConnectionFailedListener {
+    companion object {
+        val STRATEGY = P2P_POINT_TO_POINT
+        val SERVICE_ID = "123456"
+        val NAME = "Cupid"
+        val TAG = "MAIN"
+    }
 
     private val model = ModelModule.dataAccessLayer
-    private var discovering = false
+    private val controller = MainController(model)
+
+    private val MULTIPLE_PERMISSIONS = 1
+    private lateinit var mGoogleApiClient: GoogleApiClient
+
+    private val mConnectionService: ConnectionService = ConnectionService.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        mGoogleApiClient = GoogleApiClient.Builder(this)
+            .addApi(Nearby.CONNECTIONS_API)
+            .build()
 
-        // TODO dummy data
-        var avatarId = 2
-        var name = "Steven"
-
+        mConnectionService.setGoogleApiClient(mGoogleApiClient)
+        mConnectionService.setGoogleApiClientListener(mConnectionService)
+        controller.bind(this)
+        controller.init()
+    
 
         main_button_menu.setImageResource(getAvatarFromId(this, avatarId))
         nav_menu.getHeaderView(0).layout_drawer_navigation_header.imageView.setImageResource(
@@ -50,8 +82,16 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         )
         nav_menu.getHeaderView(0).layout_drawer_navigation_header.textView.text = name
 
-        updateGradientAnimation()
-        setClickListeners()
+    }
+      
+    override fun onStart() {
+        super.onStart()
+        controller.updateUserInfo()
+
+        mConnectionService.getGoogleApiClient()!!.registerConnectionCallbacks(this)
+        mConnectionService.getGoogleApiClient()!!.registerConnectionFailedListener(this)
+        mConnectionService.getGoogleApiClient()!!.connect()
+
 
         checkPermissions()
 
@@ -59,138 +99,152 @@ class MainActivity : AppCompatActivity(), DomainObserver {
 
     private val MULTIPLE_PERMISSIONS = 1
 
+    override fun onStop() {
+        super.onStop()
+        mConnectionService.getGoogleApiClient()!!.disconnect()
+    }
 
-    private fun updateGradientAnimation(){
+    override val name: String
+        get() = NAME
+    override val serviceId: String
+        get() = SERVICE_ID
+    override val strategy: Strategy?
+        get() = STRATEGY
+
+    private fun startDiscovery() {
+        val discoveryOptions : DiscoveryOptions = DiscoveryOptions.Builder().setStrategy(STRATEGY).build()
+        Nearby.getConnectionsClient(this)
+            .startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions)
+    }
+
+    override fun updateUserInfo(avatarId: Int, name: String) {
+        nav_menu.getHeaderView(0)
+            .layout_drawer_navigation_header
+            .imageView
+            .setImageResource(
+                getAvatarFromId(this, avatarId)
+            )
+        nav_menu
+            .getHeaderView(0)
+            .layout_drawer_navigation_header
+            .textView.text = name
+        main_button_menu.setImageResource(getAvatarFromId(this, avatarId))
+    }
+
+    override fun updateGradientAnimation() {
+        
+      
         val backAnimation = main_layout.background as AnimationDrawable
         backAnimation.setEnterFadeDuration(10)
         backAnimation.setExitFadeDuration(3000)
         backAnimation.start()
     }
 
-    private fun setClickListeners(){
-
+    override fun updateClickListeners(mDiscovering: Boolean) {
         val drawerLayout: DrawerLayout = drawer_layout
         val anim = AnimationUtils.loadAnimation(this, R.anim.stripe_anim)
 
         main_button_discover.setOnClickListener {
 
             // TODO start/stop discovery
-            if(!discovering){
+            if (!mDiscovering) {
+                startAdvertising()
+                startDiscovery()
+              // ######
                 findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
                 stripe_layout.startAnimation(anim)
                 findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
 
                 /* Merge: Start discovery process*/
 
-            }else{
+            } else {
                 findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_inactive)
                 stripe_layout.clearAnimation()
                 findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation)
 
                 /* Merge: Stop discovery process*/
             }
-            discovering = !discovering
-
             updateGradientAnimation()
         }
 
-
-        main_button_menu.setOnClickListener{
+        main_button_menu.setOnClickListener {
             drawerLayout.openDrawer(Gravity.LEFT)
         }
 
-        main_button_debug.setOnClickListener{
-            launchDiscoveredPopup(it)
+        main_button_debug.setOnClickListener {
+            // TODO: NearBy Conncection
+            //mainController.clientDiscovered()
+            launchDiscoveredPopup(2, "Bob")
         }
 
-        nav_menu.menu.findItem(R.id.nav_settings).setOnMenuItemClickListener {
-            val myIntent = Intent(this, SettingsActivity::class.java)
-            this.startActivity(myIntent)
-            true
-
-        }
-
-
-        nav_menu.menu.findItem(R.id.nav_about).setOnMenuItemClickListener {
-            val myIntent = Intent(this, AboutActivity::class.java)
-            this.startActivity(myIntent)
-            true
-
-        }
+        nav_menu.menu.findItem(R.id.nav_settings)
+            .setOnMenuItemClickListener {
+                val myIntent = Intent(this, SettingsActivity::class.java)
+                this.startActivity(myIntent)
+                true
+            }
 
 
-
+        nav_menu.menu.findItem(R.id.nav_about)
+            .setOnMenuItemClickListener {
+                val myIntent = Intent(this, AboutActivity::class.java)
+                this.startActivity(myIntent)
+                true
+            }
     }
 
 
-    private fun launchDiscoveredPopup(v: View) {
+    override fun launchDiscoveredPopup(
+        partnerAvatarId: Int,
+        partnerName: String
+    ) {
+        with(Dialog(this)) {
+            setContentView(R.layout.dialog_discovered)
 
+            image_discover_avatar
+                .setImageResource(getAvatarFromId(this@MainActivity, partnerAvatarId))
 
-        val discoverDialog = Dialog(this)
-        discoverDialog.setContentView(R.layout.dialog_discovered)
+            text_discover_name.text = partnerName
 
-        // TODO dummy data -> Fill in on connect
-        val partnerAvatarId = 8
-        val partnerName = "Bob"
+            button_discover_connect.setOnClickListener {
+                // Agreement to go further
+                /*TODO check if partner has already answered */
+                launchWaitingPopup()
+                this.dismiss()
+            }
 
-        discoverDialog.image_discover_avatar.setImageResource(getAvatarFromId(this,partnerAvatarId))
-        discoverDialog.text_discover_name.text = partnerName
+            button_discover_close.setOnClickListener {
+                this.dismiss()
+            }
 
-        discoverDialog.button_discover_connect.setOnClickListener{
-            // Agreement to go further
-            /*TODO check if partner has already answered */
-
-            launchWaitingPopup(it)
-            discoverDialog.dismiss()
+            window!!.attributes.windowAnimations = R.style.DialogAnimation
+            window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            show()
         }
+    }
 
-        discoverDialog.button_discover_close.setOnClickListener{
-            discoverDialog.dismiss()
+    override fun launchWaitingPopup() {
+        with(Dialog(this)) {
+            setContentView(R.layout.dialog_waiting)
+            button_waiting_close.setOnClickListener {
+                this.dismiss()
+                /* TODO normally just dismiss, this is for testing purposes*/
+                val myIntent = Intent(
+                    this@MainActivity,
+                    QuizQuestionsActivity::class.java
+                )
+                //myIntent.putExtra("key", value) //Optional parameters
+                super.startActivity(myIntent)
+                /**/
+            }
+            window!!.attributes.windowAnimations = R.style.DialogAnimation
+            window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            show()
         }
-
-
-        discoverDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        discoverDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        discoverDialog.show()
-
-    }
-
-    private fun launchWaitingPopup(v: View){
-
-        val waitingDialog = Dialog(this)
-        waitingDialog.setContentView(R.layout.dialog_waiting)
-
-
-        waitingDialog.button_waiting_close.setOnClickListener{
-            waitingDialog.dismiss()
-
-            /* TODO normally just dismiss, this is for testing purposes*/
-
-            val myIntent = Intent(this, QuizQuestionsActivity::class.java)
-            //myIntent.putExtra("key", value) //Optional parameters
-            this.startActivity(myIntent)
-            /**/
-        }
-
-
-        waitingDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        waitingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        waitingDialog.show()
     }
 
 
-    override fun onStart() {
-        super.onStart()
-        model.register(this)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        model.unregister(this)
-    }
-
-
-    private fun checkPermissions() : Boolean {
+    override fun checkPermissions(): Boolean {
         /* https://developer.android.com/training/permissions/requesting */
 
         // Here, thisActivity is the current activity
@@ -207,8 +261,11 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         val arrNeededPermissions = ArrayList<String>()
 
         for (permission in arrPermissions) {
-            if (ContextCompat.checkSelfPermission(this,
-                    permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 arrNeededPermissions.add(permission)
             }
         }
@@ -228,8 +285,10 @@ class MainActivity : AppCompatActivity(), DomainObserver {
         /* https://developer.android.com/training/permissions/requesting END */
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
         when (requestCode) {
             MULTIPLE_PERMISSIONS -> {
 
@@ -256,5 +315,39 @@ class MainActivity : AppCompatActivity(), DomainObserver {
                 // Ignore all other requests.
             }
         }
+    }
+
+    private val connectionLifecycleCallback = object : ConnectionLifecycleCallback() {
+        override fun onConnectionResult(p0: String, p1: ConnectionResolution) {
+            Log.d(TAG, "Connected\n" + p0 + "\n" +  p1.toString())
+        }
+
+        override fun onDisconnected(p0: String) {
+
+        }
+
+        override fun onConnectionInitiated(p0: String, p1: ConnectionInfo) {
+
+        }
+    }
+
+    private val endpointDiscoveryCallback = object : EndpointDiscoveryCallback() {
+        override fun onEndpointFound(p0: String, p1: DiscoveredEndpointInfo) {
+            Log.d(TAG, "End Point Found\n" + p0 + "\n" +  p1.toString())
+        }
+
+        override fun onEndpointLost(p0: String) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+    }
+
+    override fun onConnected(p0: Bundle?) {
+
+    }
+
+    override fun onConnectionSuspended(p0: Int) {
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
     }
 }

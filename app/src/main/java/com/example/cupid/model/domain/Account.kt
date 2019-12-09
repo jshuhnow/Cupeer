@@ -4,12 +4,13 @@ import android.net.MacAddress
 
 
 data class Account (
-    val macAddr : MacAddress,
-    val name : String = "",
-    val age : Int = 0,
-    val avatarId : Int = 0,
-    val photoPath : String = "",
-    val bio : String = "",
-    val pub_key : String = "",
-    val pri_key : String = ""
+    //val macAddr : MacAddress,
+    var name : String = "",
+    //val age : Int = 0,
+    var avatarId : Int = 0,
+    val answers: ArrayList<Answer> = ArrayList<Answer>()
+    //val photoPath : String = "",
+    //val bio : String = "",
+    //val pub_key : String = "",
+    //val pri_key : String = ""
 )
