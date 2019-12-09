@@ -82,7 +82,7 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
     private fun setClickListeners(){
         button_result_connect.setOnClickListener{
-            proceedToNextStage()
+            controller.proceedToNextStage()
         }
 
         button_result_cancel.setOnClickListener{
