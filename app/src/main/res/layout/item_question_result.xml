@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_result_question"
-    android:layout_width="400dp"
+    android:background="@color/gradientEndActive"
+    android:layout_width="match_parent"
     android:gravity="center"
     android:layout_height="300dp">
 
@@ -20,37 +21,25 @@
         app:layout_constraintHorizontal_bias="0.307"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.143" />
+        app:layout_constraintVertical_bias="0.181" />
 
     <TextView
-        android:id="@+id/text_result_you"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/basic"
-        android:text="You"
+        android:id="@+id/text_result_partneranswer"
+        android:layout_width="257dp"
+        android:layout_height="40dp"
+        android:background="@drawable/result_speech_bubble"
+        android:paddingStart="25dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:text="Partner Answer"
         android:textAlignment="viewStart"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.208"
+        app:layout_constraintHorizontal_bias="0.59"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.501" />
-
-    <TextView
-        android:id="@+id/text_result_youranswer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/basic"
-        android:text="Your Answer"
-        android:textAlignment="viewStart"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.231"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.651" />
+        app:layout_constraintVertical_bias="0.911" />
 
     <TextView
         android:id="@+id/text_result_partner"
@@ -62,36 +51,10 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.208"
+        app:layout_constraintHorizontal_bias="0.267"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75" />
-
-    <TextView
-        android:id="@+id/text_result_partneranswer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Partner Answer"
-        android:textAlignment="viewStart"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.235"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.871" />
-
-    <ImageView
-        android:id="@+id/image_result_partner"
-        android:layout_width="39dp"
-        android:layout_height="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.706"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.535"
-        app:srcCompat="@drawable/ic_element_7" />
+        app:layout_constraintVertical_bias="0.773" />
 
     <ImageView
         android:id="@+id/image_result_you"
@@ -99,9 +62,56 @@
         android:layout_height="43dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.694"
+        app:layout_constraintHorizontal_bias="0.103"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.785"
+        app:layout_constraintVertical_bias="0.91"
         app:srcCompat="@drawable/ic_element_11" />
+
+    <TextView
+        android:id="@+id/text_result_youranswer"
+        android:layout_width="257dp"
+        android:layout_height="40dp"
+        android:background="@drawable/result_speech_bubble"
+        android:fontFamily="@font/basic"
+        android:paddingLeft="25dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:text="Your Answer"
+        android:textAlignment="viewStart"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.59"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.63" />
+
+    <TextView
+        android:id="@+id/text_result_you"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/basic"
+        android:text="You"
+        android:textAlignment="viewStart"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.245"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.503" />
+
+    <ImageView
+        android:id="@+id/image_result_partner"
+        android:layout_width="39dp"
+        android:layout_height="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.104"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.623"
+        app:srcCompat="@drawable/ic_element_7" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

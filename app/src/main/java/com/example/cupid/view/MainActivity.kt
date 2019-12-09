@@ -61,6 +61,8 @@ class MainActivity :
         setContentView(R.layout.activity_main)
 
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+      
+        checkPermissions()
 
         MyConnectionService.getInstance().setConnectionsClient(
             Nearby.getConnectionsClient(this)
@@ -69,17 +71,14 @@ class MainActivity :
         controller.bind(this)
         controller.init()
     }
-
+      
     override fun onStart() {
         super.onStart()
         controller.updateUserInfo()
-
-        //mConnectionService.getConnectionsClient()!!.startAdvertising()
     }
 
     override fun onStop() {
         super.onStop()
-
     }
 
 
@@ -98,6 +97,8 @@ class MainActivity :
     }
 
     override fun updateGradientAnimation() {
+        
+      
         val backAnimation = main_layout.background as AnimationDrawable
         backAnimation.setEnterFadeDuration(10)
         backAnimation.setExitFadeDuration(3000)
@@ -112,6 +113,9 @@ class MainActivity :
 
             // TODO start/stop discovery
             if (!mDiscovering) {
+                startAdvertising()
+                startDiscovery()
+              // ######
                 findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
                 stripe_layout.startAnimation(anim)
                 findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)

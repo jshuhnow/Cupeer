@@ -67,6 +67,7 @@ class ChatMessageListAdapter(
 
         internal fun bind(message: MessageUI) {
             messageText.text = message.payload
+            timeText.text = ""
         }
     }
 

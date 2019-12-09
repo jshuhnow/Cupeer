@@ -1,12 +1,6 @@
 <resources>
     <string name="app_name">Cupid</string>
-    <string name="title_activity_menu">Menu</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+
 
     <string name="menu_settings">Settings</string>
     <string name="menu_contact">Contact</string>
@@ -14,6 +8,7 @@
     <string name="menu_how_to">Instructions</string>
     <string name="menu_about">About</string>
 
+    <string name="text_main_how_to">Instructions</string>
     <string name="button_discover_inactive"> Discover</string>
     <string name="button_discover_active"> Searching</string>
 
@@ -54,17 +49,31 @@
         <item>Male</item>
     </string-array>
 
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="text_about_created">Created by \n\nJaeseok Huh\nAdrian Steffan</string>
+
+    <string name="text_button_results_connect">Meet</string>
+    <string name="text_button_results_cancel">Cancel</string>
+
+    <string name="chat_button_found">Found you</string>
 
 
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <string name="demo_text_greeting1">Hey there! My name is Cupee.</string>
+    <string name="demo_text_greeting2">I will guide your through a typical interaction with Cupeer!</string>
+    <string name="demo_text_greeting3">Cupeer enables you to find nearby people to socialize with, all without requiring an internet connection.</string>
+    <string name="demo_text_greeting4">Press the discover button to start discovering nearby users!</string>
+
+    <string name="demo_text_discovered1">Great, you discovered me!</string>
+    <string name="demo_text_discovered2">Next, we will both play this little personality quiz. I bet we will be a great match!</string>
+
+    <string name="demo_text_results1">In the next screen, you can compare your answers to the ones you partner gave.</string>
+    <string name="demo_text_results2">After checking them you out, you can decide if want to meet this person (or me, in this case).</string>
+
+    <!---->
+    <string name="demo_text_chat1">hmm, interesting!</string>
+    <string name="demo_text_chat2">Unfortunately I am not a real person (yet) :/</string>
+    <string name="demo_text_chat3">Otherwise we could use this chat to find each other and meet up!</string>
+    <string name="demo_text_chat4">To end the chat after meeting the other person, use the button at the top. </string>
+    <string name="demo_text_chat5">Thank you for using Cupeer!</string>
 
 
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

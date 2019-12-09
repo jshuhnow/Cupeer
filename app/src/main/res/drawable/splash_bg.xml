@@ -6,7 +6,7 @@
         android:drawable="@color/gradientMiddle"/>
 
     <item
-        android:drawable="@drawable/ic_element_12"
+        android:drawable="@drawable/ic_element_11"
         android:gravity="center_vertical|center_horizontal"
         android:height="85dp"
         android:width="80dp"/>
