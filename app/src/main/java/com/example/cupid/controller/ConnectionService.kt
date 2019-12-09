@@ -38,9 +38,6 @@ class ConnectionService : GoogleApiClientListener {
     fun getGoogleApiClient() = mGoogleApiClient
     fun setGoogleApiClient(googleApiClient : GoogleApiClient) {
         mGoogleApiClient = googleApiClient
-        mGoogleApiClient!!.registerConnectionCallbacks(this)
-        mGoogleApiClient!!.registerConnectionFailedListener(this)
-        mGoogleApiClient!!.connect()
     }
 
     // Create setter for every member variable
@@ -49,14 +46,17 @@ class ConnectionService : GoogleApiClientListener {
     //and also call the respective methods of the listeners.
     override fun onConnected(p0: Bundle?) {
         Log.d(TAG, "CONNECTED")
+        mGoogleApiClientListener!!.onConnected(p0)
     }
 
     override fun onConnectionSuspended(reason: Int) {
         Log.d(TAG, "ConnectionSuspended")
+        mGoogleApiClientListener!!.onConnectionSuspended(reason)
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
         Log.d(TAG, "ConnectionResult")
+        mGoogleApiClientListener!!.onConnectionFailed(p0)
     }
 
     data class Endpoint (

@@ -44,4 +44,8 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.google.android.gms:play-services-nearby:17.0.0'
+
+    annotationProcessor 'com.google.auto.value:auto-value:1.4'
+    annotationProcessor 'com.ryanharter.auto.value:auto-value-parcel:0.2.5'
+    compileOnly 'com.jakewharton.auto.value:auto-value-annotations:1.4'
 }

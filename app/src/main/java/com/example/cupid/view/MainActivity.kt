@@ -39,10 +39,15 @@ import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 
-class MainActivity : AppCompatActivity(), MainView {
+class MainActivity :
+    ConnectionsActivity(),
+    MainView,
+    GoogleApiClient.ConnectionCallbacks,
+    GoogleApiClient.OnConnectionFailedListener {
     companion object {
         val STRATEGY = P2P_POINT_TO_POINT
         val SERVICE_ID = "123456"
+        val NAME = "Cupid"
         val TAG = "MAIN"
     }
 
@@ -63,7 +68,7 @@ class MainActivity : AppCompatActivity(), MainView {
             .addApi(Nearby.CONNECTIONS_API)
             .build()
 
-        mConnectionService.setGoogleApiClient(mGoogleApiClient);
+        mConnectionService.setGoogleApiClient(mGoogleApiClient)
         mConnectionService.setGoogleApiClientListener(mConnectionService)
         controller.bind(this)
         controller.init()
@@ -72,25 +77,27 @@ class MainActivity : AppCompatActivity(), MainView {
     override fun onStart() {
         super.onStart()
         controller.updateUserInfo()
+
+        mConnectionService.getGoogleApiClient()!!.registerConnectionCallbacks(this)
+        mConnectionService.getGoogleApiClient()!!.registerConnectionFailedListener(this)
+        mConnectionService.getGoogleApiClient()!!.connect()
+
         startAdvertising()
-    }
-
-    private fun startAdvertising() {
-        val advertisingOptions =
-            AdvertisingOptions.Builder().setStrategy(STRATEGY).build()
-
-        Nearby.getConnectionsClient(this)
-            .startAdvertising(
-                model.getUserName(),
-                SERVICE_ID,
-                connectionLifecycleCallback,
-                advertisingOptions
-            )
-    }
-
-    private fun stopAdvertising() {
+        startDiscovery()
 
     }
+
+    override fun onStop() {
+        super.onStop()
+        mConnectionService.getGoogleApiClient()!!.disconnect()
+    }
+
+    override val name: String
+        get() = NAME
+    override val serviceId: String
+        get() = SERVICE_ID
+    override val strategy: Strategy?
+        get() = STRATEGY
 
     private fun startDiscovery() {
         val discoveryOptions : DiscoveryOptions = DiscoveryOptions.Builder().setStrategy(STRATEGY).build()
@@ -315,5 +322,15 @@ class MainActivity : AppCompatActivity(), MainView {
         override fun onEndpointLost(p0: String) {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
+    }
+
+    override fun onConnected(p0: Bundle?) {
+
+    }
+
+    override fun onConnectionSuspended(p0: Int) {
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
     }
 }
