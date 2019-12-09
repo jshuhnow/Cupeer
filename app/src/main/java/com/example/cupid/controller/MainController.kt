@@ -23,7 +23,6 @@ class MainController(private val model: DataAccessLayer)
     private lateinit var view:MainView
     private var mDiscovering = false
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
-    private var mEndPoint : Endpoint? = null
 
     companion object {
         const val TAG = "MainController"
@@ -130,11 +129,11 @@ class MainController(private val model: DataAccessLayer)
 
     fun rejectTheConnection() {
         mConnectionService.send(ReplyToken(false, STAGE))
-        mConnectionService.disconnect(mEndPoint!!)
+        mConnectionService.myDisconnect()
     }
 
     fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage == 0) {
+        if (replyToken.stage == STAGE) {
             if (replyToken.isAccepted) {
                 view.proceedToNextStage()
             } else {
@@ -144,8 +143,7 @@ class MainController(private val model: DataAccessLayer)
             Log.d(TAG, "ReplyToken of unexpected stage")
         }
     }
-    override fun newPartnerfound(endpoint: Endpoint) {
-        mEndPoint = endpoint
+    override fun newPartnerfound() {
 
         mConnectionService.send(model.getUserAccount()!!)
 

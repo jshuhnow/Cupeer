@@ -48,6 +48,10 @@ class DataAccessLayer (
         accountRepository.userAccount!!.answers.add(Answer(questionId, answerId))
     }
 
+    fun updatePartnerAnswer(questionId: Int, answerId : Int) {
+        accountRepository.partnerAccount!!.answers.add(Answer(questionId, answerId))
+    }
+
     fun getUserAnswers() : ArrayList<Answer>{
         return accountRepository.userAccount!!.answers
     }

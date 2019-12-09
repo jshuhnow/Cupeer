@@ -32,6 +32,7 @@ class MyConnectionService :
     private var mNearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver? = null
 
     private val mNearbyRecvPayloadQueue = NearbyRecvPayloadQueue()
+    private var mEndPoint : Endpoint? = null
 
     fun getConnectionsClient() = mConnectionsClient
     fun setConnectionsClient(connectionsClient: ConnectionsClient) {
@@ -317,6 +318,10 @@ class MyConnectionService :
         mEstablishedConnections.remove(endpoint.id)
     }
 
+    fun myDisconnect() {
+        disconnect(mEndPoint!!)
+    }
+
     /** Disconnects from all currently connected endpoints.  */
     fun disconnectFromAllEndpoints() {
         for (endpoint in mEstablishedConnections.values) {
@@ -379,7 +384,8 @@ class MyConnectionService :
 
     /** Called when someone has connected to us. Override this method to act on the event.  */
     fun onEndpointConnected(endpoint: Endpoint) {
-        mNearbyNewPartnerFoundObserver!!.newPartnerfound(endpoint)
+        mEndPoint = endpoint
+        mNearbyNewPartnerFoundObserver!!.newPartnerfound()
     }
 
     /** Called when someone has disconnected. Override this method to act on the event.  */

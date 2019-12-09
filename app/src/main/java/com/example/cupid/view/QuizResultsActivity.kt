@@ -115,4 +115,5 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
         waitingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         waitingDialog.show()
     }
+
 }
