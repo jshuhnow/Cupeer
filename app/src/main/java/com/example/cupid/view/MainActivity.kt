@@ -24,10 +24,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.example.cupid.R
 import com.example.cupid.controller.MainController
 import com.example.cupid.model.ModelModule
-import com.example.cupid.model.observer.NearbyAdvertisingListener
-import com.example.cupid.model.observer.NearbyConnectionListener
-import com.example.cupid.model.observer.NearbyDiscoveringListener
-import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
+import com.example.cupid.model.observer.*
 import com.example.cupid.view.utils.getAvatarFromId
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -35,6 +32,7 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.android.gms.nearby.connection.Strategy.P2P_POINT_TO_POINT
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
@@ -72,8 +70,6 @@ class MainActivity() :
         }
 
         main_button_debug.setOnClickListener {
-            // TODO: NearBy Conncection
-            //mainController.clientDiscovered()
             launchDiscoveredPopup(2, "Bob")
         }
 
@@ -92,7 +88,6 @@ class MainActivity() :
             }
 
         main_button_discover.setOnClickListener {
-            // TODO start/stop discovery
             controller.hitDiscoverButton()
         }
     }
@@ -100,7 +95,6 @@ class MainActivity() :
     override fun onStart() {
         super.onStart()
         controller.updateUserInfo()
-        controller.startAdvertising()
     }
 
     override fun onStop() {
@@ -140,11 +134,13 @@ class MainActivity() :
             stripe_layout.startAnimation(anim)
             findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
 
+            controller.startDiscovering()
         } else {
             findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_inactive)
             stripe_layout.clearAnimation()
             findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation)
 
+            controller.stopDiscovering()
         }
         updateGradientAnimation()
     }
@@ -274,5 +270,7 @@ class MainActivity() :
         }
     }
 
-    //launchDiscoveredPopup(avartarId, name)
+    override fun partnerFound(avatarId: Int, name: String) {
+        launchDiscoveredPopup(avatarId, name)
+    }
 }

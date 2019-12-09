@@ -110,7 +110,6 @@ class MyConnectionService :
 
                 // Accept
                 acceptConnection(endpoint)
-                mNearbyNewPartnerFoundObserver!!.found()
             }
 
             override fun onConnectionResult(
@@ -381,7 +380,9 @@ class MyConnectionService :
     fun onConnectionFailed(endpoint: Endpoint?) {}
 
     /** Called when someone has connected to us. Override this method to act on the event.  */
-    fun onEndpointConnected(endpoint: Endpoint?) {}
+    fun onEndpointConnected(endpoint: Endpoint?) {
+        mNearbyNewPartnerFoundObserver!!.newPartnerfound()
+    }
 
     /** Called when someone has disconnected. Override this method to act on the event.  */
     fun onEndpointDisconnected(endpoint: Endpoint?) {}

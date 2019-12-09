@@ -42,7 +42,6 @@ class DataAccessLayer (
     fun updatePartnerAccount(avartarId : Int,
                       name : String) {
         accountRepository.partnerAccount = Account(name=name, avatarId=avartarId)
-        notify(AccountObserver::partnerFound)
     }
 
     fun updateUserAnswer(questionId : Int, answerId : Int) {

@@ -78,7 +78,7 @@ class MainController(private val model: DataAccessLayer)
                 "D"
             )
         )
-        model.updateUserAccount(0, "Alice")
+        model.updateUserAccount(1, "Alice")
     }
 
     fun updateUserInfo() {
@@ -111,7 +111,7 @@ class MainController(private val model: DataAccessLayer)
         mConnectionService.send(model.getUserAccount()!!)
         val res = mConnectionService.pullNearbyPayload(this)
         if (res != null) {
-            val account = res as Account
+            val account = res.obj as Account
             partnerInfoArrived(account.avatarId, account.name)
         }
     }
@@ -123,6 +123,7 @@ class MainController(private val model: DataAccessLayer)
 
     fun partnerInfoArrived(avartarId : Int, name : String) {
         model.updatePartnerAccount(avartarId, name)
+        view.partnerFound(avartarId, name)
     }
 
 

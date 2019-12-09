@@ -14,15 +14,15 @@ class NearbyPayload : Parcelable {
 
         if (type == "Account") {
             this.obj = parcel.readParcelable<Account>(
-                Account::javaClass.javaClass.classLoader
-            )!!
+                Account::class.java.classLoader
+            )
         } else if (type == "Answer") {
             this.obj = parcel.readParcelable<Answer>(
-                Answer::javaClass.javaClass.classLoader
+                Answer::class.java.classLoader
             )
         } else if (type== "Message") {
-            this.obj = parcel.readParcelable<Message>(
-                Message::javaClass.javaClass.classLoader
+            this.obj = parcel.readParcelable(
+                Message::class.java.classLoader
             )
         } else {
             Log.d(TAG, "Unknown Type Error")
@@ -36,6 +36,7 @@ class NearbyPayload : Parcelable {
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(type)
+        parcel.writeParcelable(obj, flags)
     }
 
     override fun describeContents(): Int {
