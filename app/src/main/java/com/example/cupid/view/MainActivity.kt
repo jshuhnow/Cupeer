@@ -13,8 +13,6 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.Manifest
-import android.content.pm.PackageManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -74,13 +72,8 @@ class MainActivity :
         mConnectionService.setGoogleApiClientListener(mConnectionService)
         controller.bind(this)
         controller.init()
-    
 
-        main_button_menu.setImageResource(getAvatarFromId(this, avatarId))
-        nav_menu.getHeaderView(0).layout_drawer_navigation_header.imageView.setImageResource(
-            getAvatarFromId(this, avatarId)
-        )
-        nav_menu.getHeaderView(0).layout_drawer_navigation_header.textView.text = name
+
 
     }
       
@@ -97,7 +90,7 @@ class MainActivity :
 
     }
 
-    private val MULTIPLE_PERMISSIONS = 1
+
 
     override fun onStop() {
         super.onStop()
@@ -289,6 +282,7 @@ class MainActivity :
         requestCode: Int,
         permissions: Array<String>, grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             MULTIPLE_PERMISSIONS -> {
 

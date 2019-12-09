@@ -37,9 +37,9 @@ class SettingsActivity :
         setContentView(R.layout.settings_activity)
 
         // TODO dummy values read in from model
-        name = ""
-        iconId = 11
-        spinner_settings_icon.setBackgroundResource(getAvatarFromId(this,iconId))
+        mName = ""
+        mIconId = 11
+        spinner_settings_icon.setBackgroundResource(getAvatarFromId(this,mIconId))
         setClickListeners()
     }
 
