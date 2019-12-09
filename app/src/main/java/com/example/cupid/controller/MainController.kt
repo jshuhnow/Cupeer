@@ -1,13 +1,17 @@
 package com.example.cupid.controller
 
+import android.os.Parcelable
+import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.DataAccessLayer
-import com.example.cupid.model.domain.Question
+
 import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.view.MainView
 import com.example.cupid.view.MyConnectionService
 import com.google.android.gms.nearby.connection.ConnectionsClient
+import com.google.android.gms.nearby.connection.Payload
 
-class MainController(private val model: DataAccessLayer) {
+class MainController(private val model: DataAccessLayer)
+    : NearbyNewPartnerFoundObserver{
     private lateinit var view:MainView
     private var mDiscovering = false
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
@@ -22,23 +26,17 @@ class MainController(private val model: DataAccessLayer) {
             .setConnectionsClient(connectionsClient)
     }
 
-    fun registerNearbyNewPartnerFoundObserver(nearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver) {
-        MyConnectionService.getInstance()
-            .registerNearbyNewPartnerFoundObserver(nearbyNewPartnerFoundObserver)
-    }
-
-    fun unregisterNearbyNewPartnerFoundObserver() {
-        MyConnectionService.getInstance()
-            .unregisterNearbyNewPartnerFoundObserver()
-    }
-
-
     fun startAdvertising() {
         mConnectionService.startAdvertising()
+        mConnectionService
+            .registerNearbyNewPartnerFoundObserver(this)
+
     }
 
     fun stopAdvertising() {
         mConnectionService.stopAdvertising()
+        mConnectionService
+            .unregisterNearbyNewPartnerFoundObserver()
     }
 
     fun startDiscovering() {
@@ -105,5 +103,14 @@ class MainController(private val model: DataAccessLayer) {
             stopDiscovering()
         }
     }
+
+    override fun found() {
+        mConnectionService.send(model.getUserAccount()!!)
+    }
+
+    override fun partnerInfoArrived(avartarId : Int, name : String) {
+        model.updatePartnerAccount(avartarId, name)
+    }
+
 
 }

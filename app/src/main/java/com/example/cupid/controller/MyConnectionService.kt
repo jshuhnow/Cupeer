@@ -1,26 +1,21 @@
 package com.example.cupid.view
 
-import android.Manifest
-import android.R
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
+import android.os.Message
+import android.os.Parcelable
 import android.util.Log
-import android.widget.Toast
-import androidx.annotation.CallSuper
-import androidx.core.app.ActivityCompat.recreate
-import androidx.core.app.ActivityCompat.requestPermissions
-import androidx.core.content.ContextCompat
+import com.example.cupid.controller.util.ParcelableUtil
+import com.example.cupid.model.domain.Account
+import com.example.cupid.model.domain.Answer
+import com.example.cupid.model.domain.NearbyPayload
 import com.example.cupid.model.observer.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Status
-import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
-import kotlin.reflect.KFunction
 
 
 /** A class that connects to Nearby Connections and provides convenience methods and callbacks.  */
@@ -36,6 +31,7 @@ class MyConnectionService :
     private var mNearbyEndpointListener: NearbyEndpointListener? = null
     private var mNearbyConnectionListener: NearbyConnectionListener? = null
     private var mNearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver? = null
+
 
     fun getConnectionsClient() = mConnectionsClient
     fun setConnectionsClient(connectionsClient: ConnectionsClient) {
@@ -112,7 +108,7 @@ class MyConnectionService :
 
                 // Accept
                 acceptConnection(endpoint)
-                mNearbyNewPartnerFoundObserver!!.found(1, "Bob")
+                mNearbyNewPartnerFoundObserver!!.found()
             }
 
             override fun onConnectionResult(
@@ -403,7 +399,18 @@ class MyConnectionService :
      *
      * @param payload The data you want to send.
      */
-    fun send(payload: Payload) {
+
+    fun send(obj: Parcelable) {
+        val type = when(obj) {
+            is Account -> "Account"
+            is Answer -> "Answer"
+            is Message -> "Message"
+            else -> "Error"
+        }
+        val payload = Payload.fromBytes(
+            ParcelableUtil.marshall(NearbyPayload(type, obj))
+        )
+
         send(payload, mEstablishedConnections.keys)
     }
 
@@ -424,6 +431,9 @@ class MyConnectionService :
      */
     fun onReceive(endpoint: Endpoint?, payload: Payload?) {
         logV(payload.toString())
+        val bytes = payload!!.asBytes()
+        val parcel = ParcelableUtil.unmarshall(bytes!!)
+        val nearbyPayload = NearbyPayload(parcel)
 
     }
 

@@ -1,5 +1,6 @@
 package com.example.cupid.model.observer
 
 interface NearbyNewPartnerFoundObserver {
-    fun found(avartarId : Int, name: String)
+    fun found()
+    fun partnerInfoArrived(avartarId : Int, name : String)
 }

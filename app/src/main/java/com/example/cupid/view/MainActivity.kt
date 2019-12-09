@@ -42,8 +42,7 @@ import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 class MainActivity() :
     AppCompatActivity(),
-    MainView,
-    NearbyNewPartnerFoundObserver
+    MainView
 {
 
     private val model = ModelModule.dataAccessLayer
@@ -102,14 +101,11 @@ class MainActivity() :
         super.onStart()
         controller.updateUserInfo()
         controller.startAdvertising()
-        controller.registerNearbyNewPartnerFoundObserver(this)
     }
 
     override fun onStop() {
         super.onStop()
         controller.stopAdvertising()
-        controller.unregisterNearbyNewPartnerFoundObserver()
-
     }
 
 
@@ -278,8 +274,5 @@ class MainActivity() :
         }
     }
 
-    override fun found(avartarId: Int, name: String) {
-        launchDiscoveredPopup(avartarId, name)
-    }
-
+    //launchDiscoveredPopup(avartarId, name)
 }
