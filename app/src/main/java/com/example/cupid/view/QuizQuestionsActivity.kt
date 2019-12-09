@@ -8,100 +8,65 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.example.cupid.R
+import com.example.cupid.controller.QuizQuestionsController
+import com.example.cupid.model.ModelModule
+import com.example.cupid.model.domain.Question
 import com.example.cupid.view.adapters.QuestionCardStackAdapter
 import com.example.cupid.view.data.QuestionUI
 import com.yuyakaido.android.cardstackview.*
 import kotlinx.android.synthetic.main.activity_quiz_questions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 
-class QuizQuestionsActivity : AppCompatActivity(), CardStackListener {
+class QuizQuestionsActivity :
+    AppCompatActivity(),
+    CardStackListener,
+    QuizQuestionsView
+{
+    private val model = ModelModule.dataAccessLayer
+    private val controller = QuizQuestionsController(model)
 
     private var questionCardStackAdapter : QuestionCardStackAdapter? = null
     private var layoutManager : CardStackLayoutManager? = null
     private var cardStackView : CardStackView? = null
 
-    private val questions: ArrayList<QuestionUI> = arrayListOf()
+    private val mQuestions: ArrayList<QuestionUI> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_questions)
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-
-        // TODO replace dummy data
-
-
-        questions.add(QuestionUI (
-            questionText = "You win a lottery! What do you do with the money?",
-            choices = arrayListOf(
-                "Spend it now!",
-                "Better save it.",
-                "Give it away.",
-                "")
-        ))
-
-        questions.add(QuestionUI (
-            questionText = "Question2",
-            choices = arrayListOf(
-                "A",
-                "B",
-                "C",
-                "D")
-        ))
-
-        questions.add(QuestionUI (
-            questionText = "Question3",
-            choices = arrayListOf("A","B","C","D")
-        ))
-
-
-
-        /* RecyclerView configuration */
-
-        cardStackView = quiz_card_stack_view
-
-        layoutManager = CardStackLayoutManager(this,this)
-        layoutManager!!.setSwipeableMethod(SwipeableMethod.Automatic)
-        layoutManager!!.setStackFrom(StackFrom.Top)
-        layoutManager!!.setSwipeThreshold(1.0f)
-        cardStackView!!.layoutManager = layoutManager
-
-        questionCardStackAdapter =
-            QuestionCardStackAdapter(questions, cardStackView, this)
-        cardStackView!!.adapter = questionCardStackAdapter
-
-
+        controller.bind(this)
+        controller.init()
     }
-
 
     override fun onCardDisappeared(view: View, position: Int) {
-        if(layoutManager!!.topPosition == (questions.size-1)){
-            launchWaitingPopup(view)
+        if(layoutManager!!.topPosition == (mQuestions.size-1)){
+            launchWaitingPopup()
         }
     }
 
-    private fun launchWaitingPopup(v: View){
+    private fun launchWaitingPopup(){
+        with( Dialog(this)) {
+            setContentView(R.layout.dialog_waiting)
+            button_waiting_close.setOnClickListener{
+                this.dismiss()
 
-        val waitingDialog = Dialog(this)
-        waitingDialog.setContentView(R.layout.dialog_waiting)
+                /*TODO normally just dismiss, this is for testing purposes*/
 
+                val myIntent = Intent(
+                    this@QuizQuestionsActivity,
+                    QuizResultsActivity::class.java
+                )
 
-        waitingDialog.button_waiting_close.setOnClickListener{
-            waitingDialog.dismiss()
-
-            /*TODO normally just dismiss, this is for testing purposes*/
-
-            val myIntent = Intent(this, QuizResultsActivity::class.java)
-            //myIntent.putExtra("key", value) //Optional parameters
-            this.startActivity(myIntent)
-            /**/
+                //myIntent.putExtra("key", value) //Optional parameters
+                this@QuizQuestionsActivity.startActivity(myIntent)
+                /**/
+            }
+            window!!.attributes.windowAnimations = R.style.DialogAnimation
+            window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            show()
         }
-
-
-
-        waitingDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        waitingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        waitingDialog.show()
     }
 
     override fun onCardDragging(direction: Direction, ratio: Float) {}
@@ -113,4 +78,26 @@ class QuizQuestionsActivity : AppCompatActivity(), CardStackListener {
     override fun onCardCanceled() {}
 
     override fun onCardAppeared(view: View, position: Int) {}
+
+    override fun showQuestions(questions : ArrayList<Question>?) {
+        mQuestions.clear()
+        for (question in questions!!) {
+            mQuestions.add(QuestionUI(
+                questionText = question.questionText,
+                choices = question.choices
+            ))
+        }
+
+        /* RecyclerView configuration */
+        cardStackView = quiz_card_stack_view
+
+        layoutManager = CardStackLayoutManager(this,this)
+        layoutManager!!.setSwipeableMethod(SwipeableMethod.Automatic)
+        layoutManager!!.setStackFrom(StackFrom.Top)
+        layoutManager!!.setSwipeThreshold(1.0f)
+        cardStackView!!.layoutManager = layoutManager
+
+        questionCardStackAdapter = QuestionCardStackAdapter(mQuestions, cardStackView, this)
+        cardStackView!!.adapter = questionCardStackAdapter
+    }
 }

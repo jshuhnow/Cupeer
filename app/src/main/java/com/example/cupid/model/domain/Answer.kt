@@ -1,5 +1,6 @@
 package com.example.cupid.model.domain
 
-class Answer (
-    val answerId : Int = 0
+data class Answer (
+    val questionId : Int = -1,
+    val answerId : Int = -1
 )

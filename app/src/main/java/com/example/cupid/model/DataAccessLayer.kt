@@ -1,12 +1,21 @@
 package com.example.cupid.model
 
 import android.net.MacAddress
+import com.example.cupid.model.domain.Account
+import com.example.cupid.model.domain.Answer
+import com.example.cupid.model.domain.Message
+import com.example.cupid.model.domain.Question
 import com.example.cupid.model.observer.AccountObserver
 import com.example.cupid.model.observer.DomainObserver
+import com.example.cupid.model.observer.MessageObserver
+import com.example.cupid.model.observer.QuestionObserver
 import com.example.cupid.model.repository.AccountRepository
+import com.example.cupid.model.repository.MessageRepository
+import com.example.cupid.model.repository.QuestionRepository
 
 class DataAccessLayer (
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val questionRepository: QuestionRepository
 ) {
 
     private val observers = mutableListOf<DomainObserver>()
@@ -15,19 +24,40 @@ class DataAccessLayer (
 
     fun unregister(observer: DomainObserver) = observers.remove(observer)
 
-    fun performLogin(name: String,
-                     age : Int,
-                     avatarId : Int,
-                     photoPath : String,
-                     bio : String,
-                     macAddress: MacAddress) {
-        // TODO: Do login
-        notify(AccountObserver::accountLoggedIn)
-    }
-
     private fun notify(action: (AccountObserver) -> Unit) {
         observers.filterIsInstance<AccountObserver>().onEach { action(it) }
     }
-    fun getCurrentAccount() = accountRepository.account
 
+    fun getUserName() = accountRepository.userAccount!!.name
+    fun getUserAccount() = accountRepository.userAccount
+    fun getPartnerAccount() = accountRepository.partnerAccount
+
+    fun updateUserAccount(avartarId: Int,
+                          name : String) {
+        accountRepository.userAccount = Account(name=name, avatarId= avartarId)
+        notify(AccountObserver::userAccountUpdated)
+    }
+
+    fun updatePartnerAccount(avartarId : Int,
+                      name : String) {
+        accountRepository.partnerAccount = Account(name=name, avatarId=avartarId)
+        notify(AccountObserver::partnerFound)
+    }
+
+    fun updateUserAnswer(questionId : Int, answerId : Int) {
+        accountRepository.userAccount!!.answers.add(Answer(questionId, answerId))
+    }
+
+    fun getQuestions() = questionRepository.questions
+
+    fun addQuestions(questionText : String, choices : ArrayList<String>) {
+        questionRepository.questions.add(Question(
+            questionText = questionText,
+            choices = choices,
+            questionId = questionRepository.questions.size
+        ))
+    }
+    fun setQuestions(questions : ArrayList<Question>) {
+        questionRepository.questions = questions
+    }
 }
