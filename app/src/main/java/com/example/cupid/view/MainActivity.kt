@@ -20,11 +20,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.cupid.R
-import com.example.cupid.controller.ConnectionService
 import com.example.cupid.controller.MainController
 import com.example.cupid.model.ModelModule
-import com.example.cupid.model.observer.GoogleApiClientListener
 import com.example.cupid.model.observer.NearbyAdvertisingListener
+import com.example.cupid.model.observer.NearbyConnectionListener
 import com.example.cupid.model.observer.NearbyDiscoveringListener
 import com.example.cupid.view.utils.getAvatarFromId
 import com.google.android.gms.common.ConnectionResult
@@ -32,7 +31,6 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.android.gms.nearby.connection.Strategy.P2P_POINT_TO_POINT
-import com.google.android.material.circularreveal.CircularRevealHelper.STRATEGY
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
@@ -40,10 +38,10 @@ import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 
 class MainActivity :
-    ConnectionsActivity(),
-    MainView,
-    GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener {
+    AppCompatActivity(),
+    MainView
+{
+
     companion object {
         val STRATEGY = P2P_POINT_TO_POINT
         val SERVICE_ID = "123456"
@@ -55,21 +53,19 @@ class MainActivity :
     private val controller = MainController(model)
 
     private val MULTIPLE_PERMISSIONS = 1
-    private lateinit var mGoogleApiClient: GoogleApiClient
+    private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
 
-    private val mConnectionService: ConnectionService = ConnectionService.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        mGoogleApiClient = GoogleApiClient.Builder(this)
-            .addApi(Nearby.CONNECTIONS_API)
-            .build()
 
-        mConnectionService.setGoogleApiClient(mGoogleApiClient)
-        mConnectionService.setGoogleApiClientListener(mConnectionService)
+        MyConnectionService.getInstance().setConnectionsClient(
+            Nearby.getConnectionsClient(this)
+        )
+
         controller.bind(this)
         controller.init()
     }
@@ -78,32 +74,14 @@ class MainActivity :
         super.onStart()
         controller.updateUserInfo()
 
-        mConnectionService.getGoogleApiClient()!!.registerConnectionCallbacks(this)
-        mConnectionService.getGoogleApiClient()!!.registerConnectionFailedListener(this)
-        mConnectionService.getGoogleApiClient()!!.connect()
-
-        startAdvertising()
-        startDiscovery()
-
+        //mConnectionService.getConnectionsClient()!!.startAdvertising()
     }
 
     override fun onStop() {
         super.onStop()
-        mConnectionService.getGoogleApiClient()!!.disconnect()
+
     }
 
-    override val name: String
-        get() = NAME
-    override val serviceId: String
-        get() = SERVICE_ID
-    override val strategy: Strategy?
-        get() = STRATEGY
-
-    private fun startDiscovery() {
-        val discoveryOptions : DiscoveryOptions = DiscoveryOptions.Builder().setStrategy(STRATEGY).build()
-        Nearby.getConnectionsClient(this)
-            .startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions)
-    }
 
     override fun updateUserInfo(avatarId: Int, name: String) {
         nav_menu.getHeaderView(0)
@@ -270,8 +248,10 @@ class MainActivity :
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<String>, grantResults: IntArray
+        permissions: Array<String>,
+        grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             MULTIPLE_PERMISSIONS -> {
 
@@ -298,39 +278,5 @@ class MainActivity :
                 // Ignore all other requests.
             }
         }
-    }
-
-    private val connectionLifecycleCallback = object : ConnectionLifecycleCallback() {
-        override fun onConnectionResult(p0: String, p1: ConnectionResolution) {
-            Log.d(TAG, "Connected\n" + p0 + "\n" +  p1.toString())
-        }
-
-        override fun onDisconnected(p0: String) {
-
-        }
-
-        override fun onConnectionInitiated(p0: String, p1: ConnectionInfo) {
-
-        }
-    }
-
-    private val endpointDiscoveryCallback = object : EndpointDiscoveryCallback() {
-        override fun onEndpointFound(p0: String, p1: DiscoveredEndpointInfo) {
-            Log.d(TAG, "End Point Found\n" + p0 + "\n" +  p1.toString())
-        }
-
-        override fun onEndpointLost(p0: String) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-    }
-
-    override fun onConnected(p0: Bundle?) {
-
-    }
-
-    override fun onConnectionSuspended(p0: Int) {
-    }
-
-    override fun onConnectionFailed(p0: ConnectionResult) {
     }
 }
