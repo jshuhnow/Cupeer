@@ -57,6 +57,23 @@
     <string name="chat_button_found">Found you</string>
 
 
+    <string name="demo_text_greeting1">Hey there! My name is Cupee.</string>
+    <string name="demo_text_greeting2">I will guide your through a typical interaction with Cupeer!</string>
+    <string name="demo_text_greeting3">Cupeer enables you to find nearby people to socialize with, all without requiring an internet connection.</string>
+    <string name="demo_text_greeting4">Press the discover button to start discovering nearby users!</string>
+
+    <string name="demo_text_discovered1">Great, you discovered me!</string>
+    <string name="demo_text_discovered2">Next, we will both play this little personality quiz. I bet we will be a great match!</string>
+
+    <string name="demo_text_results1">In the next screen, you can compare your answers to the ones you partner gave.</string>
+    <string name="demo_text_results2">After checking them you out, you can decide if want to meet this person (or me, in this case).</string>
+
+    <!---->
+    <string name="demo_text_chat1">hmm, interesting!</string>
+    <string name="demo_text_chat2">Unfortunately I am not a real person (yet) :/</string>
+    <string name="demo_text_chat3">Otherwise we could use this chat to find each other and meet up!</string>
+    <string name="demo_text_chat4">To end the chat after meeting the other person, use the button at the top. </string>
+    <string name="demo_text_chat5">Thank you for using Cupeer!</string>
 
 
 </resources>
