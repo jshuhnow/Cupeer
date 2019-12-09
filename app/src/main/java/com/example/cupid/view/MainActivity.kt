@@ -9,6 +9,8 @@ import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -25,6 +27,7 @@ import com.example.cupid.model.ModelModule
 import com.example.cupid.model.observer.NearbyAdvertisingListener
 import com.example.cupid.model.observer.NearbyConnectionListener
 import com.example.cupid.model.observer.NearbyDiscoveringListener
+import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.view.utils.getAvatarFromId
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -37,24 +40,16 @@ import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 
-class MainActivity :
+class MainActivity() :
     AppCompatActivity(),
-    MainView
+    MainView,
+    NearbyNewPartnerFoundObserver
 {
-
-    companion object {
-        val STRATEGY = P2P_POINT_TO_POINT
-        val SERVICE_ID = "123456"
-        val NAME = "Cupid"
-        val TAG = "MAIN"
-    }
 
     private val model = ModelModule.dataAccessLayer
     private val controller = MainController(model)
 
     private val MULTIPLE_PERMISSIONS = 1
-    private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,21 +59,57 @@ class MainActivity :
       
         checkPermissions()
 
-        MyConnectionService.getInstance().setConnectionsClient(
+        controller.registerClient(
             Nearby.getConnectionsClient(this)
         )
 
         controller.bind(this)
         controller.init()
+
+        val drawerLayout: DrawerLayout = drawer_layout
+
+        main_button_menu.setOnClickListener {
+            drawerLayout.openDrawer(Gravity.LEFT)
+        }
+
+        main_button_debug.setOnClickListener {
+            // TODO: NearBy Conncection
+            //mainController.clientDiscovered()
+            launchDiscoveredPopup(2, "Bob")
+        }
+
+        nav_menu.menu.findItem(R.id.nav_settings)
+            .setOnMenuItemClickListener {
+                val myIntent = Intent(this, SettingsActivity::class.java)
+                this.startActivity(myIntent)
+                true
+            }
+
+        nav_menu.menu.findItem(R.id.nav_about)
+            .setOnMenuItemClickListener {
+                val myIntent = Intent(this, AboutActivity::class.java)
+                this.startActivity(myIntent)
+                true
+            }
+
+        main_button_discover.setOnClickListener {
+            // TODO start/stop discovery
+            controller.hitDiscoverButton()
+        }
     }
       
     override fun onStart() {
         super.onStart()
         controller.updateUserInfo()
+        controller.startAdvertising()
+        controller.registerNearbyNewPartnerFoundObserver(this)
     }
 
     override fun onStop() {
         super.onStop()
+        controller.stopAdvertising()
+        controller.unregisterNearbyNewPartnerFoundObserver()
+
     }
 
 
@@ -106,58 +137,21 @@ class MainActivity :
     }
 
     override fun updateClickListeners(mDiscovering: Boolean) {
-        val drawerLayout: DrawerLayout = drawer_layout
         val anim = AnimationUtils.loadAnimation(this, R.anim.stripe_anim)
 
-        main_button_discover.setOnClickListener {
+        if (mDiscovering) {
+            findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
+            stripe_layout.startAnimation(anim)
+            findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
 
-            // TODO start/stop discovery
-            if (!mDiscovering) {
-                startAdvertising()
-                startDiscovery()
-              // ######
-                findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
-                stripe_layout.startAnimation(anim)
-                findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
+        } else {
+            findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_inactive)
+            stripe_layout.clearAnimation()
+            findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation)
 
-                /* Merge: Start discovery process*/
-
-            } else {
-                findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_inactive)
-                stripe_layout.clearAnimation()
-                findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation)
-
-                /* Merge: Stop discovery process*/
-            }
-            updateGradientAnimation()
         }
-
-        main_button_menu.setOnClickListener {
-            drawerLayout.openDrawer(Gravity.LEFT)
-        }
-
-        main_button_debug.setOnClickListener {
-            // TODO: NearBy Conncection
-            //mainController.clientDiscovered()
-            launchDiscoveredPopup(2, "Bob")
-        }
-
-        nav_menu.menu.findItem(R.id.nav_settings)
-            .setOnMenuItemClickListener {
-                val myIntent = Intent(this, SettingsActivity::class.java)
-                this.startActivity(myIntent)
-                true
-            }
-
-
-        nav_menu.menu.findItem(R.id.nav_about)
-            .setOnMenuItemClickListener {
-                val myIntent = Intent(this, AboutActivity::class.java)
-                this.startActivity(myIntent)
-                true
-            }
+        updateGradientAnimation()
     }
-
 
     override fun launchDiscoveredPopup(
         partnerAvatarId: Int,
@@ -283,4 +277,9 @@ class MainActivity :
             }
         }
     }
+
+    override fun found(avartarId: Int, name: String) {
+        launchDiscoveredPopup(avartarId, name)
+    }
+
 }

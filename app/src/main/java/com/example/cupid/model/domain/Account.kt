@@ -1,8 +1,10 @@
 package com.example.cupid.model.domain
 
 import android.net.MacAddress
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-
+@Parcelize
 data class Account (
     //val macAddr : MacAddress,
     var name : String = "",
@@ -13,4 +15,4 @@ data class Account (
     //val bio : String = "",
     //val pub_key : String = "",
     //val pri_key : String = ""
-)
+) : Parcelable
