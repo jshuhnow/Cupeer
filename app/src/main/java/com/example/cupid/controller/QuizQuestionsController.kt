@@ -17,6 +17,6 @@ class QuizQuestionsController(
     }
 
     fun chooseAnswer(questionId : Int, answerId : Int) {
-        // Access a model
+        model.updateUserAnswer(questionId, answerId)
     }
 }

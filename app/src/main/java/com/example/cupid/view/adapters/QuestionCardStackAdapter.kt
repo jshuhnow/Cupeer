@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.cupid.controller.QuizQuestionsController
 import com.example.cupid.view.data.QuestionUI
 import com.yuyakaido.android.cardstackview.CardStackView
 import kotlinx.android.synthetic.main.item_question.view.*
@@ -15,7 +16,8 @@ import kotlinx.android.synthetic.main.item_question.view.*
 class QuestionCardStackAdapter(
     private var questions: List<QuestionUI> = emptyList(),
     private var cardViewStack : CardStackView? =  null,
-    private var context : Activity? = null
+    private var context : Activity? = null,
+    private var controller : QuizQuestionsController
 ) : RecyclerView.Adapter<QuestionCardStackAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -45,11 +47,23 @@ class QuestionCardStackAdapter(
 
         holder.itemView.layout_quiz_question.background = context!!.getDrawable(bgColors[position])
 
-        // TODO get data out there
-        holder.itemView.text_quiz_answer1.setOnClickListener { v -> cardViewStack!!.swipe() }
-        holder.itemView.text_quiz_answer2.setOnClickListener { v -> cardViewStack!!.swipe() }
-        holder.itemView.text_quiz_answer3.setOnClickListener { v -> cardViewStack!!.swipe() }
-        holder.itemView.text_quiz_answer4.setOnClickListener { v -> cardViewStack!!.swipe() }
+
+        holder.itemView.text_quiz_answer1.setOnClickListener {
+            controller.chooseAnswer(position, 0)
+            cardViewStack!!.swipe()
+        }
+        holder.itemView.text_quiz_answer2.setOnClickListener {
+            controller.chooseAnswer(position, 1)
+            cardViewStack!!.swipe()
+        }
+        holder.itemView.text_quiz_answer3.setOnClickListener {
+            controller.chooseAnswer(position, 2)
+            cardViewStack!!.swipe()
+        }
+        holder.itemView.text_quiz_answer4.setOnClickListener {
+            controller.chooseAnswer(position, 4)
+            cardViewStack!!.swipe()
+        }
     }
 
     override fun getItemCount(): Int {

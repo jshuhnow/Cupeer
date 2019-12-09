@@ -15,7 +15,8 @@ import com.example.cupid.model.repository.QuestionRepository
 
 class DataAccessLayer (
     private val accountRepository: AccountRepository,
-    private val questionRepository: QuestionRepository
+    private val questionRepository: QuestionRepository,
+    private val messageRepository: MessageRepository
 ) {
 
     private val observers = mutableListOf<DomainObserver>()
@@ -48,6 +49,14 @@ class DataAccessLayer (
         accountRepository.userAccount!!.answers.add(Answer(questionId, answerId))
     }
 
+    fun getUserAnswers() : ArrayList<Answer>{
+        return accountRepository.userAccount!!.answers
+    }
+
+    fun getPartnerAnswers() : ArrayList<Answer>{
+        return accountRepository.partnerAccount!!.answers
+    }
+
     fun getQuestions() = questionRepository.questions
 
     fun addQuestions(questionText : String, choices : ArrayList<String>) {
@@ -60,4 +69,10 @@ class DataAccessLayer (
     fun setQuestions(questions : ArrayList<Question>) {
         questionRepository.questions = questions
     }
+
+    fun getMessages() : ArrayList<Message>?{
+        return messageRepository.messages // TODO
+    }
+
+
 }

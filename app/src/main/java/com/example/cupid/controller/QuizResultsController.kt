@@ -1,6 +1,7 @@
 package com.example.cupid.controller
 
 import com.example.cupid.model.DataAccessLayer
+import com.example.cupid.model.domain.Account
 import com.example.cupid.view.QuizResultsView
 
 class QuizResultsController(
@@ -13,14 +14,11 @@ class QuizResultsController(
     }
 
     fun init() {
-        view.showAnswers(model.getQuestions(),
-            model.getUserAccount()!!.answers,
-            model.getPartnerAccount()!!.answers
+        view.renderAnswers(model.getQuestions(),
+            model.getUserAccount() as Account,
+            model.getUserAnswers(),
+            model.getPartnerAccount() as Account,
+            model.getPartnerAnswers()
         )
-    }
-
-    fun chooseAnswer(questionId : Int, answerId : Int) {
-        // Access a model
-        model.updateUserAnswer(questionId, answerId)
     }
 }

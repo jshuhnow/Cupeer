@@ -36,11 +36,20 @@ class SettingsActivity :
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
 
-        // TODO dummy values read in from model
-        mName = ""
-        mIconId = 11
-        spinner_settings_icon.setBackgroundResource(getAvatarFromId(this,mIconId))
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val modelData = controller.readUserInformation()
+
+        //spinner_settings_icon.setBackgroundResource(getAvatarFromId(this,mIconId))
+
         setClickListeners()
+        mIconId = modelData.first
+        mName = modelData.second
+        edittext_settings_name.setText(mName)
+        spinner_settings_icon.setSelection(mIconId-1)
     }
 
     private fun setClickListeners(){

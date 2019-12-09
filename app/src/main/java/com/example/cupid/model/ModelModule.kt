@@ -1,6 +1,7 @@
 package com.example.cupid.model
 
 import com.example.cupid.model.repository.AccountRepository
+import com.example.cupid.model.repository.MessageRepository
 import com.example.cupid.model.repository.QuestionRepository
 
 object ModelModule {
@@ -9,6 +10,7 @@ object ModelModule {
 
     private fun dataAccessLayer() = DataAccessLayer(
         AccountRepository(),
-        QuestionRepository()
+        QuestionRepository(),
+        MessageRepository()
     )
 }

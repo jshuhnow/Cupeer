@@ -10,6 +10,12 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cupid.R
+import com.example.cupid.controller.QuizResultsController
+import com.example.cupid.model.DataAccessLayer
+import com.example.cupid.model.ModelModule
+import com.example.cupid.model.domain.Account
+import com.example.cupid.model.domain.Answer
+import com.example.cupid.model.domain.Question
 import com.example.cupid.view.adapters.ResultListAdapter
 import com.example.cupid.view.data.ResultUI
 import com.example.cupid.view.utils.launchRejectedPopup
@@ -17,57 +23,50 @@ import com.example.cupid.view.utils.returnToMain
 import kotlinx.android.synthetic.main.activity_quiz_results.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 
-class QuizResultsActivity : AppCompatActivity() {
+class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
     private var resultListAdapter : ResultListAdapter? = null
     private var layoutManager : RecyclerView.LayoutManager? = null
     private var resultRecyclerView : RecyclerView? = null
+
+    private var model : DataAccessLayer = ModelModule.dataAccessLayer
+    private var controller : QuizResultsController = QuizResultsController(model)
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_results)
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-        // Todo get data from repository
-        // Todo change the data into the UI format shown below
+        controller.bind(this)
+        controller.init()
+
+        setClickListeners()
+    }
+
+    override fun renderAnswers(questions : ArrayList<Question>?,
+                               myAccount: Account,
+                               myAnswer : ArrayList<Answer>?,
+                               partnerAccount: Account,
+                               partnerAnswer : ArrayList<Answer>?) {
 
         val results: ArrayList<ResultUI> = arrayListOf()
 
-        results.add(
-            ResultUI (
-                question_text = "Question Text",
-                answerYou = "AAAAA",
-                answerPartner = "BBBBB",
-                nameYou = "You",
-                namePartner = "Bob",
-                iconIdPartner = 2,
-                iconIdYou = 3
+        questions!!.forEachIndexed { i, question ->
+            results.add(
+                ResultUI (
+                    question_text = question.questionText,
+                    answerYou = question.choices[myAnswer!![i].answerId],
+                    answerPartner = question.choices[partnerAnswer!![i].answerId],
+                    nameYou = myAccount.name,
+                    namePartner = partnerAccount.name,
+                    iconIdPartner = partnerAccount.avatarId,
+                    iconIdYou = myAccount.avatarId
+                )
             )
-        )
+        }
 
-        results.add(
-            ResultUI (
-                question_text = "Question Text",
-                answerYou = "AAAAA",
-                answerPartner = "BBBBB",
-                nameYou = "You",
-                namePartner = "Bob",
-                iconIdPartner = 2,
-                iconIdYou = 3
-            )
-        )
-
-        results.add(
-            ResultUI (
-                question_text = "Question Text",
-                answerYou = "AAAAA",
-                answerPartner = "BBBBB",
-                nameYou = "You",
-                namePartner = "Bob",
-                iconIdPartner = 2,
-                iconIdYou = 3
-            )
-        )
 
         /* RecyclerView configuration */
         resultRecyclerView = result_recycler_view
@@ -79,7 +78,6 @@ class QuizResultsActivity : AppCompatActivity() {
         resultListAdapter = ResultListAdapter(results, this)
         resultRecyclerView!!.adapter = resultListAdapter
 
-        setClickListeners()
     }
 
     private fun setClickListeners(){

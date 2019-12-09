@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateInterpolator
 import com.example.cupid.R
 import com.example.cupid.controller.QuizQuestionsController
 import com.example.cupid.model.ModelModule
@@ -42,6 +43,7 @@ class QuizQuestionsActivity :
 
     override fun onCardDisappeared(view: View, position: Int) {
         if(layoutManager!!.topPosition == (mQuestions.size-1)){
+            //TODO this gets executed after all questions are answered -> nearby has to do something
             launchWaitingPopup()
         }
     }
@@ -95,9 +97,17 @@ class QuizQuestionsActivity :
         layoutManager!!.setSwipeableMethod(SwipeableMethod.Automatic)
         layoutManager!!.setStackFrom(StackFrom.Top)
         layoutManager!!.setSwipeThreshold(1.0f)
+
+        val setting = SwipeAnimationSetting.Builder()
+            .setDirection(Direction.Right)
+            .setDuration(Duration.Slow.duration) // Duration.Normal.duration
+            .setInterpolator(AccelerateInterpolator())
+            .build()
+
+        layoutManager!!.setSwipeAnimationSetting(setting)
         cardStackView!!.layoutManager = layoutManager
 
-        questionCardStackAdapter = QuestionCardStackAdapter(mQuestions, cardStackView, this)
+        questionCardStackAdapter = QuestionCardStackAdapter(mQuestions, cardStackView, this, controller)
         cardStackView!!.adapter = questionCardStackAdapter
     }
 }
