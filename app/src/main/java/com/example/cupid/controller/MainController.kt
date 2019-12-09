@@ -3,15 +3,18 @@ package com.example.cupid.controller
 import android.os.Parcelable
 import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.DataAccessLayer
+import com.example.cupid.model.domain.Account
+import com.example.cupid.model.domain.NearbyPayload
 
 import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
+import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MainView
 import com.example.cupid.view.MyConnectionService
 import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.google.android.gms.nearby.connection.Payload
 
 class MainController(private val model: DataAccessLayer)
-    : NearbyNewPartnerFoundObserver{
+    : NearbyNewPartnerFoundObserver, QueueObserver {
     private lateinit var view:MainView
     private var mDiscovering = false
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
@@ -104,11 +107,21 @@ class MainController(private val model: DataAccessLayer)
         }
     }
 
-    override fun found() {
+    override fun newPartnerfound() {
         mConnectionService.send(model.getUserAccount()!!)
+        val res = mConnectionService.pullNearbyPayload(this)
+        if (res != null) {
+            val account = res as Account
+            partnerInfoArrived(account.avatarId, account.name)
+        }
     }
 
-    override fun partnerInfoArrived(avartarId : Int, name : String) {
+    override fun newElementArrived(nearbyPayload: NearbyPayload) {
+        val account = nearbyPayload.obj as Account
+        partnerInfoArrived(account.avatarId, account.name)
+    }
+
+    fun partnerInfoArrived(avartarId : Int, name : String) {
         model.updatePartnerAccount(avartarId, name)
     }
 

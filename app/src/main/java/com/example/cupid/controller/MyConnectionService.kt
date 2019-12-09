@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Message
 import android.os.Parcelable
 import android.util.Log
+import com.example.cupid.controller.util.NearbyRecvPayloadQueue
 import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Answer
@@ -32,6 +33,7 @@ class MyConnectionService :
     private var mNearbyConnectionListener: NearbyConnectionListener? = null
     private var mNearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver? = null
 
+    private val mNearbyRecvPayloadQueue = NearbyRecvPayloadQueue()
 
     fun getConnectionsClient() = mConnectionsClient
     fun setConnectionsClient(connectionsClient: ConnectionsClient) {
@@ -435,6 +437,11 @@ class MyConnectionService :
         val parcel = ParcelableUtil.unmarshall(bytes!!)
         val nearbyPayload = NearbyPayload(parcel)
 
+        mNearbyRecvPayloadQueue.enqueue(nearbyPayload)
+    }
+
+    fun pullNearbyPayload(queueObserver: QueueObserver) : NearbyPayload? {
+        return mNearbyRecvPayloadQueue.dequeue(queueObserver)
     }
 
     /**
