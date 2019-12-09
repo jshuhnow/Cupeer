@@ -24,6 +24,10 @@ class NearbyPayload : Parcelable {
             this.obj = parcel.readParcelable(
                 Message::class.java.classLoader
             )
+        } else if (type=="ReplyToken" ) {
+            this.obj = parcel.readParcelable(
+                ReplyToken::class.java.classLoader
+            )
         } else {
             Log.d(TAG, "Unknown Type Error")
         }

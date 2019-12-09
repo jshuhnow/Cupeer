@@ -47,6 +47,7 @@ class MainActivity() :
     private val controller = MainController(model)
 
     private val MULTIPLE_PERMISSIONS = 1
+    private var waitingDialog : Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,13 +159,12 @@ class MainActivity() :
             text_discover_name.text = partnerName
 
             button_discover_connect.setOnClickListener {
-                // Agreement to go further
-                /*TODO check if partner has already answered */
-                launchWaitingPopup()
+                controller.acceptTheConnection()
                 this.dismiss()
             }
 
             button_discover_close.setOnClickListener {
+                controller.rejectTheConnection()
                 this.dismiss()
             }
 
@@ -175,18 +175,11 @@ class MainActivity() :
     }
 
     override fun launchWaitingPopup() {
-        with(Dialog(this)) {
+        waitingDialog = Dialog(this)
+        with(waitingDialog!!) {
             setContentView(R.layout.dialog_waiting)
             button_waiting_close.setOnClickListener {
-                this.dismiss()
-                /* TODO normally just dismiss, this is for testing purposes*/
-                val myIntent = Intent(
-                    this@MainActivity,
-                    QuizQuestionsActivity::class.java
-                )
-                //myIntent.putExtra("key", value) //Optional parameters
-                super.startActivity(myIntent)
-                /**/
+                this!!.dismiss()
             }
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -194,6 +187,16 @@ class MainActivity() :
         }
     }
 
+    override fun proceedToNextStage() {
+        if (waitingDialog != null)
+            waitingDialog!!.dismiss()
+        val myIntent = Intent(
+            this@MainActivity,
+            QuizQuestionsActivity::class.java
+        )
+
+        super.startActivity(myIntent)
+    }
 
     override fun checkPermissions(): Boolean {
         /* https://developer.android.com/training/permissions/requesting */

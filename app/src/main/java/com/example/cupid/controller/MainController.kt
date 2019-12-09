@@ -1,10 +1,15 @@
 package com.example.cupid.controller
 
 import android.os.Parcelable
+import android.util.Log
+import com.example.cupid.R
+import com.example.cupid.controller.NearbyController.Companion.TAG
 import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.Account
+import com.example.cupid.model.domain.Endpoint
 import com.example.cupid.model.domain.NearbyPayload
+import com.example.cupid.model.domain.ReplyToken
 
 import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.model.observer.QueueObserver
@@ -18,7 +23,12 @@ class MainController(private val model: DataAccessLayer)
     private lateinit var view:MainView
     private var mDiscovering = false
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+    private var mEndPoint : Endpoint? = null
 
+    companion object {
+        const val TAG = "MainController"
+        const val STAGE = 0
+    }
 
     fun bind(mainView : MainView) {
         view = mainView
@@ -107,8 +117,38 @@ class MainController(private val model: DataAccessLayer)
         }
     }
 
-    override fun newPartnerfound() {
+    fun acceptTheConnection() {
+        mConnectionService.send(ReplyToken(true, STAGE))
+        val res = mConnectionService.pullNearbyPayload(this)
+        if (res != null) {
+            val replyToken = res.obj as ReplyToken
+            processReplyToken(replyToken)
+        } else {
+            view.launchWaitingPopup()
+        }
+    }
+
+    fun rejectTheConnection() {
+        mConnectionService.send(ReplyToken(false, STAGE))
+        mConnectionService.disconnect(mEndPoint!!)
+    }
+
+    fun processReplyToken(replyToken : ReplyToken) {
+        if (replyToken.stage == 0) {
+            if (replyToken.isAccepted) {
+                view.proceedToNextStage()
+            } else {
+                // go back
+            }
+        } else {
+            Log.d(TAG, "ReplyToken of unexpected stage")
+        }
+    }
+    override fun newPartnerfound(endpoint: Endpoint) {
+        mEndPoint = endpoint
+
         mConnectionService.send(model.getUserAccount()!!)
+
         val res = mConnectionService.pullNearbyPayload(this)
         if (res != null) {
             val account = res.obj as Account
@@ -116,9 +156,18 @@ class MainController(private val model: DataAccessLayer)
         }
     }
 
+
     override fun newElementArrived(nearbyPayload: NearbyPayload) {
-        val account = nearbyPayload.obj as Account
-        partnerInfoArrived(account.avatarId, account.name)
+        if (nearbyPayload.type == "Account") {
+            val account = nearbyPayload.obj as Account
+            partnerInfoArrived(account.avatarId, account.name)
+        } else if (nearbyPayload.type == "ReplyToken") {
+            val replyToken = nearbyPayload.obj as ReplyToken
+            processReplyToken(replyToken)
+        } else {
+            Log.d(TAG, "NearbyPayload of unexpected type")
+        }
+
     }
 
     fun partnerInfoArrived(avartarId : Int, name : String) {

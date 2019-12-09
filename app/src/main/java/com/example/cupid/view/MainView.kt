@@ -8,4 +8,5 @@ interface MainView {
     fun checkPermissions() : Boolean
     fun launchWaitingPopup()
     fun partnerFound(avatarId: Int, name: String)
+    fun proceedToNextStage()
 }

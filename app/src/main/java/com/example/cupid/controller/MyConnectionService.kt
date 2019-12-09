@@ -6,9 +6,7 @@ import android.os.Parcelable
 import android.util.Log
 import com.example.cupid.controller.util.NearbyRecvPayloadQueue
 import com.example.cupid.controller.util.ParcelableUtil
-import com.example.cupid.model.domain.Account
-import com.example.cupid.model.domain.Answer
-import com.example.cupid.model.domain.NearbyPayload
+import com.example.cupid.model.domain.*
 import com.example.cupid.model.observer.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Status
@@ -380,8 +378,8 @@ class MyConnectionService :
     fun onConnectionFailed(endpoint: Endpoint?) {}
 
     /** Called when someone has connected to us. Override this method to act on the event.  */
-    fun onEndpointConnected(endpoint: Endpoint?) {
-        mNearbyNewPartnerFoundObserver!!.newPartnerfound()
+    fun onEndpointConnected(endpoint: Endpoint) {
+        mNearbyNewPartnerFoundObserver!!.newPartnerfound(endpoint)
     }
 
     /** Called when someone has disconnected. Override this method to act on the event.  */
@@ -408,6 +406,7 @@ class MyConnectionService :
             is Account -> "Account"
             is Answer -> "Answer"
             is Message -> "Message"
+            is ReplyToken -> "ReplyToken"
             else -> "Error"
         }
         val payload = Payload.fromBytes(
@@ -482,25 +481,7 @@ class MyConnectionService :
         Log.e(TAG, msg, e)
     }
 
-    /** Represents a device we can talk to.  */
-    class Endpoint(val id: String, val name: String) {
 
-        override fun equals(obj: Any?): Boolean {
-            if (obj is Endpoint) {
-                return id == obj.id
-            }
-            return false
-        }
-
-        override fun hashCode(): Int {
-            return id.hashCode()
-        }
-
-        override fun toString(): String {
-            return String.format("Endpoint{id=%s, name=%s}", id, name)
-        }
-
-    }
 
     //Check out ConnectionActivity.java class in google sample code and write similar methods
     //and also call the respective methods of the listeners.
