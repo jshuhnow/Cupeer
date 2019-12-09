@@ -1,7 +1,7 @@
 package com.example.cupid.view
 
+import android.content.Context
 import android.os.Bundle
-import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cupid.R
 import kotlinx.android.synthetic.main.settings_activity.*
@@ -10,9 +10,12 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.Display
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.example.cupid.view.utils.getAvatarFromId
+import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.ImageView
 import com.example.cupid.controller.SettingsController
 import com.example.cupid.model.ModelModule
 
@@ -33,6 +36,10 @@ class SettingsActivity :
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
 
+        // TODO dummy values read in from model
+        name = ""
+        iconId = 11
+        spinner_settings_icon.setBackgroundResource(getAvatarFromId(this,iconId))
         setClickListeners()
     }
 
@@ -42,10 +49,15 @@ class SettingsActivity :
             writeUserInformation()
             finish()
         }
-        // Repeted, refactor this later
-        val adapterIcon = ArrayAdapter.createFromResource(
+
+        // Repeated, refactor this later
+
+        val adapterIcon = CustomAdapter<String>(
             this,
-            R.array.settings_icons, android.R.layout.simple_spinner_item)
+            R.layout.item_settings_spinner,R.id.text_item_spinner_layout,
+            arrayOf("1","2","3","4","5","6","7","8","9","10","11","12")
+        )
+
 
         adapterIcon.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
@@ -62,12 +74,12 @@ class SettingsActivity :
         adapterIcon.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         spinner_settings_icon.adapter = adapterIcon
-        spinner_settings_gender.adapter = adapterGender
-        spinner_settings_looking_for.adapter = adapterLookingFor
+        //spinner_settings_gender.adapter = adapterGender
+        //spinner_settings_looking_for.adapter = adapterLookingFor
 
         spinner_settings_icon.onItemSelectedListener = this
-        spinner_settings_gender.onItemSelectedListener = this
-        spinner_settings_looking_for.onItemSelectedListener = this
+        //spinner_settings_gender.onItemSelectedListener = this
+        //spinner_settings_looking_for.onItemSelectedListener = this
 
         edittext_settings_name.addTextChangedListener(object : TextWatcher {
 
@@ -93,13 +105,15 @@ class SettingsActivity :
         when (parent.id){
             R.id.spinner_settings_icon -> {
                 mIconId = value.toInt()
+                spinner_settings_icon.setBackgroundResource(getAvatarFromId(this,mIconId))
             }
+            /*
             R.id.spinner_settings_gender -> {
                 mGender = value
             }
             R.id.spinner_settings_looking_for -> {
                 mLookingFor = value
-            }
+            }*/
             else -> {}
         }
 
@@ -107,6 +121,39 @@ class SettingsActivity :
 
     override fun onNothingSelected(parent: AdapterView<*>) {
 
+    }
+
+    private class CustomAdapter<T>(
+        context: Context,
+        layoutViewResourceId: Int,
+        textViewResourceId: Int,
+        objects: Array<String>
+    ) : ArrayAdapter<String>(context, layoutViewResourceId, textViewResourceId, objects) {
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = super.getView(position, convertView, parent)
+            //val textView = view.findViewById<View>(android.R.id.text1) as TextView
+            val textView = view.findViewById<View>(R.id.text_item_spinner_layout) as TextView
+            val imageView =  view.findViewById<View>(R.id.image_item_spinner_layout) as ImageView
+            imageView.setImageResource(0)
+            textView.text = ""
+
+
+            return view
+        }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = super.getView(position, convertView, parent)
+            //val textView = view.findViewById<View>(android.R.id.text1) as TextView
+            val textView = view.findViewById<View>(R.id.text_item_spinner_layout) as TextView
+            textView.text = ""
+            val imageView =  view.findViewById<View>(R.id.image_item_spinner_layout) as ImageView
+            imageView.setImageResource(getAvatarFromId(context,position+1))
+
+
+
+            return view
+        }
     }
 
     override fun readUserInformation() {
@@ -117,5 +164,6 @@ class SettingsActivity :
 
     override fun writeUserInformation() {
         controller.writeUserInformation(mIconId, mName)
+
     }
 }

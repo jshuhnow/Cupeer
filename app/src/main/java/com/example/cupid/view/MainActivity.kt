@@ -13,6 +13,8 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.Manifest
+import android.content.pm.PackageManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -72,8 +74,16 @@ class MainActivity :
         mConnectionService.setGoogleApiClientListener(mConnectionService)
         controller.bind(this)
         controller.init()
-    }
+    
 
+        main_button_menu.setImageResource(getAvatarFromId(this, avatarId))
+        nav_menu.getHeaderView(0).layout_drawer_navigation_header.imageView.setImageResource(
+            getAvatarFromId(this, avatarId)
+        )
+        nav_menu.getHeaderView(0).layout_drawer_navigation_header.textView.text = name
+
+    }
+      
     override fun onStart() {
         super.onStart()
         controller.updateUserInfo()
@@ -82,10 +92,12 @@ class MainActivity :
         mConnectionService.getGoogleApiClient()!!.registerConnectionFailedListener(this)
         mConnectionService.getGoogleApiClient()!!.connect()
 
-        startAdvertising()
-        startDiscovery()
+
+        checkPermissions()
 
     }
+
+    private val MULTIPLE_PERMISSIONS = 1
 
     override fun onStop() {
         super.onStop()
@@ -120,6 +132,8 @@ class MainActivity :
     }
 
     override fun updateGradientAnimation() {
+        
+      
         val backAnimation = main_layout.background as AnimationDrawable
         backAnimation.setEnterFadeDuration(10)
         backAnimation.setExitFadeDuration(3000)
@@ -134,6 +148,9 @@ class MainActivity :
 
             // TODO start/stop discovery
             if (!mDiscovering) {
+                startAdvertising()
+                startDiscovery()
+              // ######
                 findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
                 stripe_layout.startAnimation(anim)
                 findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)

@@ -91,8 +91,9 @@
             android:id="@+id/main_button_debug"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="#ADADAD"
+            android:backgroundTint="#00ACC1"
             android:clickable="true"
+            android:tint="#FFFFFF"
             app:backgroundTint="#00FCFCFC"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -100,11 +101,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.943"
-            app:srcCompat="@android:drawable/stat_notify_sync_noanim" />
+            app:srcCompat="@drawable/ic_info" />
 
         <ImageView
             android:id="@+id/main_button_menu"
             android:layout_width="35dp"
+            android:elevation="0dp"
             android:layout_height="129dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -115,10 +117,11 @@
             app:srcCompat="@drawable/ic_element_11" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/text_main_how_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Popup Debug"
+            android:text="@string/text_main_how_to"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -145,13 +148,6 @@
         android:padding="4dp"
         android:clipToPadding="false">
 
-
-        <Switch
-            android:id="@+id/switch_drawer_demo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:text="Demo Mode" />
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

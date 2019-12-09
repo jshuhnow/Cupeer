@@ -20,13 +20,15 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="157dp">
+            android:layout_height="157dp"
+            android:background="#EEEEEE">
 
             <Button
                 android:id="@+id/button_result_connect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#66BB6A"
+                android:layout_width="129dp"
+                android:layout_height="50dp"
+                android:background="@drawable/meet_button"
+                android:text="@string/text_button_results_connect"
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -39,8 +41,10 @@
 
             <Button
                 android:id="@+id/button_result_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="129dp"
+                android:layout_height="61dp"
+                android:text="@string/text_button_results_cancel"
+                android:textColor="#FFFDFD"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.191"
