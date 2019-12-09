@@ -56,7 +56,7 @@ class QuizResultsController(
         }
     }
     fun proceedToNextStage() {
-        mConnectionService.send(ReplyToken(true, QuizQuestionsController.STAGE))
+        mConnectionService.send(ReplyToken(true, STAGE))
 
         val res = mConnectionService.pullNearbyPayload(this)
         if (res != null) {
