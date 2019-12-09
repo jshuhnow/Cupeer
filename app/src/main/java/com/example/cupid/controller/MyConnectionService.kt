@@ -20,6 +20,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
+import kotlin.reflect.KFunction
 
 
 /** A class that connects to Nearby Connections and provides convenience methods and callbacks.  */
@@ -34,6 +35,7 @@ class MyConnectionService :
     private var mNearbyDataListener: NearbyDataListener? = null
     private var mNearbyEndpointListener: NearbyEndpointListener? = null
     private var mNearbyConnectionListener: NearbyConnectionListener? = null
+    private var mNearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver? = null
 
     fun getConnectionsClient() = mConnectionsClient
     fun setConnectionsClient(connectionsClient: ConnectionsClient) {
@@ -55,6 +57,13 @@ class MyConnectionService :
         private var mConnectionsClient : ConnectionsClient? = null
     }
 
+    fun registerNearbyNewPartnerFoundObserver(nearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver) {
+        mNearbyNewPartnerFoundObserver = nearbyNewPartnerFoundObserver
+    }
+
+    fun unregisterNearbyNewPartnerFoundObserver() {
+        mNearbyNewPartnerFoundObserver = null
+    }
 
     /** The devices we've discovered near us.  */
     private val mDiscoveredEndpoints: MutableMap<String, Endpoint> =
@@ -103,7 +112,7 @@ class MyConnectionService :
 
                 // Accept
                 acceptConnection(endpoint)
-
+                mNearbyNewPartnerFoundObserver!!.found(1, "Bob")
             }
 
             override fun onConnectionResult(
@@ -303,7 +312,9 @@ class MyConnectionService :
     /**
      * Called when a remote endpoint is discovered. To connect to the device, call [ ][.connectToEndpoint].
      */
-    fun onEndpointDiscovered(endpoint: Endpoint?) {}
+    fun onEndpointDiscovered(endpoint: Endpoint) {
+        connectToEndpoint(endpoint)
+    }
 
     /** Disconnects from the given endpoint.  */
     fun disconnect(endpoint: Endpoint) {
@@ -411,7 +422,10 @@ class MyConnectionService :
      * @param endpoint The sender.
      * @param payload The data.
      */
-    fun onReceive(endpoint: Endpoint?, payload: Payload?) {}
+    fun onReceive(endpoint: Endpoint?, payload: Payload?) {
+        logV(payload.toString())
+
+    }
 
     /**
      * Transforms a [Status] into a English-readable message for logging.

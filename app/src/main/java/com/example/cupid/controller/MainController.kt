@@ -2,6 +2,7 @@ package com.example.cupid.controller
 
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.Question
+import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.view.MainView
 import com.example.cupid.view.MyConnectionService
 import com.google.android.gms.nearby.connection.ConnectionsClient
@@ -20,6 +21,17 @@ class MainController(private val model: DataAccessLayer) {
         MyConnectionService.getInstance()
             .setConnectionsClient(connectionsClient)
     }
+
+    fun registerNearbyNewPartnerFoundObserver(nearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver) {
+        MyConnectionService.getInstance()
+            .registerNearbyNewPartnerFoundObserver(nearbyNewPartnerFoundObserver)
+    }
+
+    fun unregisterNearbyNewPartnerFoundObserver() {
+        MyConnectionService.getInstance()
+            .unregisterNearbyNewPartnerFoundObserver()
+    }
+
 
     fun startAdvertising() {
         mConnectionService.startAdvertising()
@@ -67,6 +79,7 @@ class MainController(private val model: DataAccessLayer) {
         )
         model.updateUserAccount(0, "Alice")
     }
+
     fun updateUserInfo() {
         view.updateUserInfo(model.getUserAccount()!!.avatarId, model.getUserAccount()!!.name)
     }
@@ -93,7 +106,4 @@ class MainController(private val model: DataAccessLayer) {
         }
     }
 
-    fun clientDiscovered(partnerAvartardId : Int, partnerName : String) {
-        view.launchDiscoveredPopup(partnerAvartardId, partnerName)
-    }
 }

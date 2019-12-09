@@ -9,6 +9,8 @@ import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -25,6 +27,7 @@ import com.example.cupid.model.ModelModule
 import com.example.cupid.model.observer.NearbyAdvertisingListener
 import com.example.cupid.model.observer.NearbyConnectionListener
 import com.example.cupid.model.observer.NearbyDiscoveringListener
+import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.view.utils.getAvatarFromId
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -37,9 +40,10 @@ import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 
-class MainActivity :
+class MainActivity() :
     AppCompatActivity(),
-    MainView
+    MainView,
+    NearbyNewPartnerFoundObserver
 {
 
     private val model = ModelModule.dataAccessLayer
@@ -81,7 +85,6 @@ class MainActivity :
                 true
             }
 
-
         nav_menu.menu.findItem(R.id.nav_about)
             .setOnMenuItemClickListener {
                 val myIntent = Intent(this, AboutActivity::class.java)
@@ -99,11 +102,14 @@ class MainActivity :
         super.onStart()
         controller.updateUserInfo()
         controller.startAdvertising()
+        controller.registerNearbyNewPartnerFoundObserver(this)
     }
 
     override fun onStop() {
         super.onStop()
         controller.stopAdvertising()
+        controller.unregisterNearbyNewPartnerFoundObserver()
+
     }
 
 
@@ -272,6 +278,8 @@ class MainActivity :
         }
     }
 
-
+    override fun found(avartarId: Int, name: String) {
+        launchDiscoveredPopup(avartarId, name)
+    }
 
 }
