@@ -24,17 +24,16 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.example.cupid.R
 import com.example.cupid.controller.MainController
 import com.example.cupid.model.ModelModule
-import com.example.cupid.model.observer.NearbyAdvertisingListener
-import com.example.cupid.model.observer.NearbyConnectionListener
-import com.example.cupid.model.observer.NearbyDiscoveringListener
-import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
+import com.example.cupid.model.observer.*
 import com.example.cupid.view.utils.getAvatarFromId
+import com.example.cupid.view.utils.returnToMain
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.android.gms.nearby.connection.Strategy.P2P_POINT_TO_POINT
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
@@ -42,14 +41,14 @@ import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
 class MainActivity() :
     AppCompatActivity(),
-    MainView,
-    NearbyNewPartnerFoundObserver
+    MainView
 {
 
     private val model = ModelModule.dataAccessLayer
     private val controller = MainController(model)
 
     private val MULTIPLE_PERMISSIONS = 1
+    private var waitingDialog : Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,8 +72,6 @@ class MainActivity() :
         }
 
         main_button_debug.setOnClickListener {
-            // TODO: NearBy Conncection
-            //mainController.clientDiscovered()
             launchDiscoveredPopup(2, "Bob")
         }
 
@@ -93,7 +90,6 @@ class MainActivity() :
             }
 
         main_button_discover.setOnClickListener {
-            // TODO start/stop discovery
             controller.hitDiscoverButton()
         }
     }
@@ -101,15 +97,11 @@ class MainActivity() :
     override fun onStart() {
         super.onStart()
         controller.updateUserInfo()
-        controller.startAdvertising()
-        controller.registerNearbyNewPartnerFoundObserver(this)
     }
 
     override fun onStop() {
         super.onStop()
         controller.stopAdvertising()
-        controller.unregisterNearbyNewPartnerFoundObserver()
-
     }
 
 
@@ -144,11 +136,13 @@ class MainActivity() :
             stripe_layout.startAnimation(anim)
             findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
 
+            controller.startDiscovering()
         } else {
             findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_inactive)
             stripe_layout.clearAnimation()
             findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation)
 
+            controller.stopDiscovering()
         }
         updateGradientAnimation()
     }
@@ -166,13 +160,12 @@ class MainActivity() :
             text_discover_name.text = partnerName
 
             button_discover_connect.setOnClickListener {
-                // Agreement to go further
-                /*TODO check if partner has already answered */
-                launchWaitingPopup()
+                controller.acceptTheConnection()
                 this.dismiss()
             }
 
             button_discover_close.setOnClickListener {
+                controller.rejectTheConnection()
                 this.dismiss()
             }
 
@@ -183,18 +176,12 @@ class MainActivity() :
     }
 
     override fun launchWaitingPopup() {
-        with(Dialog(this)) {
+        waitingDialog = Dialog(this)
+        with(waitingDialog!!) {
             setContentView(R.layout.dialog_waiting)
             button_waiting_close.setOnClickListener {
-                this.dismiss()
-                /* TODO normally just dismiss, this is for testing purposes*/
-                val myIntent = Intent(
-                    this@MainActivity,
-                    QuizQuestionsActivity::class.java
-                )
-                //myIntent.putExtra("key", value) //Optional parameters
-                super.startActivity(myIntent)
-                /**/
+                this!!.dismiss()
+                returnToMain(this@MainActivity)
             }
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -202,6 +189,29 @@ class MainActivity() :
         }
     }
 
+    override fun proceedToNextStage() {
+        if (waitingDialog != null)
+            waitingDialog!!.dismiss()
+
+        val DEV = false
+
+        if (DEV) {
+            val myIntent = Intent(
+                this@MainActivity,
+                ChatActivity::class.java
+            )
+            super.startActivity(myIntent)
+
+        } else {
+            val myIntent = Intent(
+                this@MainActivity,
+                QuizQuestionsActivity::class.java
+            )
+            super.startActivity(myIntent)
+
+        }
+
+    }
 
     override fun checkPermissions(): Boolean {
         /* https://developer.android.com/training/permissions/requesting */
@@ -278,8 +288,7 @@ class MainActivity() :
         }
     }
 
-    override fun found(avartarId: Int, name: String) {
-        launchDiscoveredPopup(avartarId, name)
+    override fun partnerFound(avatarId: Int, name: String) {
+        launchDiscoveredPopup(avatarId, name)
     }
-
 }

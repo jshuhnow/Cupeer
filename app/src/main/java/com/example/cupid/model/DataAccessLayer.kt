@@ -42,11 +42,14 @@ class DataAccessLayer (
     fun updatePartnerAccount(avartarId : Int,
                       name : String) {
         accountRepository.partnerAccount = Account(name=name, avatarId=avartarId)
-        notify(AccountObserver::partnerFound)
     }
 
     fun updateUserAnswer(questionId : Int, answerId : Int) {
         accountRepository.userAccount!!.answers.add(Answer(questionId, answerId))
+    }
+
+    fun updatePartnerAnswer(questionId: Int, answerId : Int) {
+        accountRepository.partnerAccount!!.answers.add(Answer(questionId, answerId))
     }
 
     fun getUserAnswers() : ArrayList<Answer>{
@@ -70,7 +73,7 @@ class DataAccessLayer (
         questionRepository.questions = questions
     }
 
-    fun getMessages() : ArrayList<Message>?{
+    fun getMessages() : ArrayList<Message> {
         return messageRepository.messages // TODO
     }
 

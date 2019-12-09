@@ -12,4 +12,6 @@ interface QuizResultsView {
                       partnerAnswer : ArrayList<Answer>?) {
 
     }
+    fun launchWaitingPopup()
+    fun proceedToNextStage()
 }

@@ -32,7 +32,7 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
     private var model : DataAccessLayer = ModelModule.dataAccessLayer
     private var controller : QuizResultsController = QuizResultsController(model)
 
-
+    private var waitingDialog : Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,37 +82,41 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
     private fun setClickListeners(){
         button_result_connect.setOnClickListener{
-            launchWaitingPopup(it)
+            controller.proceedToNextStage()
         }
 
         button_result_cancel.setOnClickListener{
             //TODO send cancel message to other person
-
+            controller.rejectTheConnection()
             returnToMain(this)
         }
     }
 
 
-    private fun launchWaitingPopup(v: View){
+    override fun launchWaitingPopup(){
 
-        val waitingDialog = Dialog(this)
-        waitingDialog.setContentView(R.layout.dialog_waiting)
+        waitingDialog = Dialog(this)
+        waitingDialog!!.setContentView(R.layout.dialog_waiting)
 
 
-        waitingDialog.button_waiting_close.setOnClickListener{
-            waitingDialog.dismiss()
-
-            /*TODO normally just dismiss, this is for testing purposes -> move this */
-
-            val myIntent = Intent(this, ChatActivity::class.java)
-            //myIntent.putExtra("key", value) //Optional parameters
-            this.startActivity(myIntent)
-            /**/
+        waitingDialog!!.button_waiting_close.setOnClickListener{
+            waitingDialog!!.dismiss()
+            controller.rejectTheConnection()
+            returnToMain(this)
         }
 
 
-        waitingDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        waitingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        waitingDialog.show()
+        waitingDialog!!.window!!.attributes.windowAnimations = R.style.DialogAnimation
+        waitingDialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        waitingDialog!!.show()
+    }
+
+    override fun proceedToNextStage() {
+        if (waitingDialog != null) {
+            waitingDialog!!.dismiss()
+        }
+        val myIntent = Intent(this, ChatActivity::class.java)
+        this.startActivity(myIntent)
+
     }
 }

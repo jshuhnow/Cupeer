@@ -61,7 +61,7 @@ class QuestionCardStackAdapter(
             cardViewStack!!.swipe()
         }
         holder.itemView.text_quiz_answer4.setOnClickListener {
-            controller.chooseAnswer(position, 4)
+            controller.chooseAnswer(position, 3)
             cardViewStack!!.swipe()
         }
     }

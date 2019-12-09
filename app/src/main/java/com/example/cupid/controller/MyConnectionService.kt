@@ -1,26 +1,20 @@
 package com.example.cupid.view
 
-import android.Manifest
-import android.R
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
+
+import android.os.Parcelable
 import android.util.Log
-import android.widget.Toast
-import androidx.annotation.CallSuper
-import androidx.core.app.ActivityCompat.recreate
-import androidx.core.app.ActivityCompat.requestPermissions
-import androidx.core.content.ContextCompat
+import com.example.cupid.controller.util.NearbyRecvPayloadQueue
+import com.example.cupid.controller.util.ParcelableUtil
+import com.example.cupid.model.domain.*
 import com.example.cupid.model.observer.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Status
-import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
-import kotlin.reflect.KFunction
 
 
 /** A class that connects to Nearby Connections and provides convenience methods and callbacks.  */
@@ -36,6 +30,9 @@ class MyConnectionService :
     private var mNearbyEndpointListener: NearbyEndpointListener? = null
     private var mNearbyConnectionListener: NearbyConnectionListener? = null
     private var mNearbyNewPartnerFoundObserver: NearbyNewPartnerFoundObserver? = null
+
+    private val mNearbyRecvPayloadQueue = NearbyRecvPayloadQueue()
+    private var mEndPoint : Endpoint? = null
 
     fun getConnectionsClient() = mConnectionsClient
     fun setConnectionsClient(connectionsClient: ConnectionsClient) {
@@ -112,7 +109,6 @@ class MyConnectionService :
 
                 // Accept
                 acceptConnection(endpoint)
-                mNearbyNewPartnerFoundObserver!!.found(1, "Bob")
             }
 
             override fun onConnectionResult(
@@ -322,6 +318,10 @@ class MyConnectionService :
         mEstablishedConnections.remove(endpoint.id)
     }
 
+    fun myDisconnect() {
+        disconnect(mEndPoint!!)
+    }
+
     /** Disconnects from all currently connected endpoints.  */
     fun disconnectFromAllEndpoints() {
         for (endpoint in mEstablishedConnections.values) {
@@ -383,7 +383,10 @@ class MyConnectionService :
     fun onConnectionFailed(endpoint: Endpoint?) {}
 
     /** Called when someone has connected to us. Override this method to act on the event.  */
-    fun onEndpointConnected(endpoint: Endpoint?) {}
+    fun onEndpointConnected(endpoint: Endpoint) {
+        mEndPoint = endpoint
+        mNearbyNewPartnerFoundObserver!!.newPartnerfound()
+    }
 
     /** Called when someone has disconnected. Override this method to act on the event.  */
     fun onEndpointDisconnected(endpoint: Endpoint?) {}
@@ -403,7 +406,19 @@ class MyConnectionService :
      *
      * @param payload The data you want to send.
      */
-    fun send(payload: Payload) {
+
+    fun send(obj: Parcelable) {
+        val type = when(obj) {
+            is Account -> "Account"
+            is Answer -> "Answer"
+            is Message -> "Message"
+            is ReplyToken -> "ReplyToken"
+            else -> "Error"
+        }
+        val payload = Payload.fromBytes(
+            ParcelableUtil.marshall(NearbyPayload(type, obj))
+        )
+
         send(payload, mEstablishedConnections.keys)
     }
 
@@ -424,7 +439,15 @@ class MyConnectionService :
      */
     fun onReceive(endpoint: Endpoint?, payload: Payload?) {
         logV(payload.toString())
+        val bytes = payload!!.asBytes()
+        val parcel = ParcelableUtil.unmarshall(bytes!!)
+        val nearbyPayload = NearbyPayload(parcel)
 
+        mNearbyRecvPayloadQueue.enqueue(nearbyPayload)
+    }
+
+    fun pullNearbyPayload(queueObserver: QueueObserver) : NearbyPayload? {
+        return mNearbyRecvPayloadQueue.dequeue(queueObserver)
     }
 
     /**
@@ -464,25 +487,7 @@ class MyConnectionService :
         Log.e(TAG, msg, e)
     }
 
-    /** Represents a device we can talk to.  */
-    class Endpoint(val id: String, val name: String) {
 
-        override fun equals(obj: Any?): Boolean {
-            if (obj is Endpoint) {
-                return id == obj.id
-            }
-            return false
-        }
-
-        override fun hashCode(): Int {
-            return id.hashCode()
-        }
-
-        override fun toString(): String {
-            return String.format("Endpoint{id=%s, name=%s}", id, name)
-        }
-
-    }
 
     //Check out ConnectionActivity.java class in google sample code and write similar methods
     //and also call the respective methods of the listeners.

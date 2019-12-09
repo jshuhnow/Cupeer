@@ -31,6 +31,7 @@ class QuizQuestionsActivity :
     private var cardStackView : CardStackView? = null
 
     private val mQuestions: ArrayList<QuestionUI> = arrayListOf()
+    private var waitingDialog : Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,26 +45,17 @@ class QuizQuestionsActivity :
     override fun onCardDisappeared(view: View, position: Int) {
         if(layoutManager!!.topPosition == (mQuestions.size-1)){
             //TODO this gets executed after all questions are answered -> nearby has to do something
-            launchWaitingPopup()
+            //launchWaitingPopup()
         }
     }
 
-    private fun launchWaitingPopup(){
-        with( Dialog(this)) {
+    override fun launchWaitingPopup(){
+        waitingDialog = Dialog(this)
+        with(waitingDialog!!) {
             setContentView(R.layout.dialog_waiting)
             button_waiting_close.setOnClickListener{
                 this.dismiss()
-
-                /*TODO normally just dismiss, this is for testing purposes*/
-
-                val myIntent = Intent(
-                    this@QuizQuestionsActivity,
-                    QuizResultsActivity::class.java
-                )
-
-                //myIntent.putExtra("key", value) //Optional parameters
-                this@QuizQuestionsActivity.startActivity(myIntent)
-                /**/
+                controller.rejectTheConnection()
             }
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -109,5 +101,16 @@ class QuizQuestionsActivity :
 
         questionCardStackAdapter = QuestionCardStackAdapter(mQuestions, cardStackView, this, controller)
         cardStackView!!.adapter = questionCardStackAdapter
+    }
+
+    override fun proceedToNextStage() {
+        if (waitingDialog != null)
+            waitingDialog!!.dismiss()
+        val myIntent = Intent(
+            this@QuizQuestionsActivity,
+            QuizResultsActivity::class.java
+        )
+
+        this@QuizQuestionsActivity.startActivity(myIntent)
     }
 }
