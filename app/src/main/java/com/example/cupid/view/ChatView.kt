@@ -5,4 +5,5 @@ import com.example.cupid.model.domain.Message
 
 interface ChatView {
     fun renderMessages(msgs: ArrayList<Message>, user: Account){}
+    fun clearTextView()
 }

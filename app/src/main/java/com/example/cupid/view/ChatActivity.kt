@@ -33,10 +33,8 @@ class ChatActivity : AppCompatActivity(), ChatView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-
         controller.bind(this)
         controller.init()
-
 
         setClickListeners()
 
@@ -66,8 +64,6 @@ class ChatActivity : AppCompatActivity(), ChatView {
         messageAdapter = ChatMessageListAdapter(this, messages)
         messageRecycler!!.adapter = messageAdapter
 
-
-
     }
 
     private fun setClickListeners(){
@@ -83,10 +79,12 @@ class ChatActivity : AppCompatActivity(), ChatView {
 
         button_chatbox_send.setOnClickListener{
             var payload = edittext_chatbox.text.toString()
-            controller.addMessage(model.getUserAccount() as Account, payload)
-
-            // TODO Send txt message to partner here
+            controller.sendMessage(Message(model.getUserAccount()!!, payload))
         }
+    }
+
+    override fun clearTextView() {
+        edittext_chatbox.setText("")
     }
 
 

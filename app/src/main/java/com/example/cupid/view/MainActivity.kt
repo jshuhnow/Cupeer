@@ -26,6 +26,7 @@ import com.example.cupid.controller.MainController
 import com.example.cupid.model.ModelModule
 import com.example.cupid.model.observer.*
 import com.example.cupid.view.utils.getAvatarFromId
+import com.example.cupid.view.utils.returnToMain
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.nearby.Nearby
@@ -180,6 +181,7 @@ class MainActivity() :
             setContentView(R.layout.dialog_waiting)
             button_waiting_close.setOnClickListener {
                 this!!.dismiss()
+                returnToMain(this@MainActivity)
             }
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -190,12 +192,25 @@ class MainActivity() :
     override fun proceedToNextStage() {
         if (waitingDialog != null)
             waitingDialog!!.dismiss()
-        val myIntent = Intent(
-            this@MainActivity,
-            QuizQuestionsActivity::class.java
-        )
 
-        super.startActivity(myIntent)
+        val DEV = true
+
+        if (DEV) {
+            val myIntent = Intent(
+                this@MainActivity,
+                ChatActivity::class.java
+            )
+            super.startActivity(myIntent)
+
+        } else {
+            val myIntent = Intent(
+                this@MainActivity,
+                QuizQuestionsActivity::class.java
+            )
+            super.startActivity(myIntent)
+
+        }
+
     }
 
     override fun checkPermissions(): Boolean {

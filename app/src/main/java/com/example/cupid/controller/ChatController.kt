@@ -27,20 +27,21 @@ class ChatController(
     }
 
     fun init() {
+        updateView()
+        fetchMessage()
+    }
+
+    fun updateView() {
         view.renderMessages(
             model.getMessages() as ArrayList<Message>,
             model.getUserAccount() as Account
         )
+        view.clearTextView()
     }
-
     fun addMessage(author: Account, payload: String){
         model.getMessages()!!.add(
             Message (0, author, payload, arrayListOf<Account>()))
-
-        view.renderMessages(
-            model.getMessages() as ArrayList<Message>,
-            model.getUserAccount() as Account
-        )
+        updateView()
     }
 
     fun sendMessage(message : Message) {

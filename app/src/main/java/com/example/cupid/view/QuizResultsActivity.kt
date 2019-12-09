@@ -102,6 +102,7 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
         waitingDialog!!.button_waiting_close.setOnClickListener{
             waitingDialog!!.dismiss()
             controller.rejectTheConnection()
+            returnToMain(this)
         }
 
 
