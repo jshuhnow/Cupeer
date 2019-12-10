@@ -38,7 +38,7 @@
 
         <TextView
             android:id="@+id/text_quiz_answer1"
-            android:layout_width="178dp"
+            android:layout_width="160dp"
             android:layout_height="87dp"
             android:background="@drawable/quiz_question_text_button"
             android:fontFamily="@font/basic"
@@ -55,7 +55,7 @@
 
         <TextView
             android:id="@+id/text_quiz_answer2"
-            android:layout_width="178dp"
+            android:layout_width="160dp"
             android:layout_height="87dp"
             android:background="@drawable/quiz_question_text_button"
             android:fontFamily="@font/basic"
@@ -72,7 +72,7 @@
 
         <TextView
             android:id="@+id/text_quiz_answer3"
-            android:layout_width="178dp"
+            android:layout_width="160dp"
             android:layout_height="87dp"
             android:background="@drawable/quiz_question_text_button"
             android:fontFamily="@font/basic"
@@ -82,14 +82,14 @@
             android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.069"
+            app:layout_constraintHorizontal_bias="0.068"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.851" />
+            app:layout_constraintVertical_bias="0.866" />
 
         <TextView
             android:id="@+id/text_quiz_answer4"
-            android:layout_width="178dp"
+            android:layout_width="160dp"
             android:layout_height="87dp"
             android:background="@drawable/quiz_question_text_button"
             android:fontFamily="@font/basic"
@@ -102,7 +102,7 @@
             app:layout_constraintHorizontal_bias="0.931"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.851" />
+            app:layout_constraintVertical_bias="0.866" />
 
         <ImageView
             android:id="@+id/imageView3"

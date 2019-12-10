@@ -66,25 +66,25 @@ class MainController(private val model: DataAccessLayer)
                 "Spend it now!",
                 "Better save it.",
                 "Give it away.",
-                ""
+                "Somehow lose it."
             )
         )
         model.addQuestions(
-            "Q2",
+            "A test is coming up. How do you study for it?",
             arrayListOf(
-                "A",
-                "B",
-                "C",
-                "D"
+                "Study hard. ",
+                "At the last second. ",
+                "Ignore it and play",
+                "Umm, what test?"
             )
         )
         model.addQuestions(
-            "Q3",
+            "A human hand extends out of a toilet! What would you do?",
             arrayListOf(
-                "A",
-                "B",
-                "C",
-                "D"
+                "Scream and run. ",
+                "Close the lid without a word",
+                "Flush frantically.",
+                "Shake hands with it."
             )
         )
         model.updateUserAccount(1, "Alice")

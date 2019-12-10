@@ -1,7 +1,9 @@
 package com.example.cupid.view
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import com.example.cupid.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +16,9 @@ import com.example.cupid.view.adapters.ChatMessageListAdapter
 import com.example.cupid.view.data.MessageUI
 import kotlinx.android.synthetic.main.activity_chat.*
 import com.example.cupid.view.utils.returnToMain
+
+
+
 
 
 //TODO deal with cancelation on partners side -> launchRejectedPopup
@@ -80,6 +85,16 @@ class ChatActivity : AppCompatActivity(), ChatView {
         button_chatbox_send.setOnClickListener{
             var payload = edittext_chatbox.text.toString()
             controller.sendMessage(Message(model.getUserAccount()!!, payload))
+
+            val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+
+            inputManager.hideSoftInputFromWindow(
+                currentFocus?.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
+
+
         }
     }
 
