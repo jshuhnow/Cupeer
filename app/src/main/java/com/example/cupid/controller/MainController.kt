@@ -6,10 +6,7 @@ import com.example.cupid.R
 import com.example.cupid.controller.NearbyController.Companion.TAG
 import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.DataAccessLayer
-import com.example.cupid.model.domain.Account
-import com.example.cupid.model.domain.Endpoint
-import com.example.cupid.model.domain.NearbyPayload
-import com.example.cupid.model.domain.ReplyToken
+import com.example.cupid.model.domain.*
 
 import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.model.observer.QueueObserver
@@ -31,6 +28,7 @@ class MainController(private val model: DataAccessLayer)
 
     fun bind(mainView : MainView) {
         view = mainView
+
     }
 
     fun registerClient(connectionsClient: ConnectionsClient) {
@@ -101,11 +99,21 @@ class MainController(private val model: DataAccessLayer)
         updateUserInfo()
         view.updateGradientAnimation()
         view.updateClickListeners(mDiscovering)
+        model.setInstructionMode(false)
     }
 
     fun hitDiscoverButton() {
         mDiscovering = !mDiscovering
         view.updateClickListeners(mDiscovering)
+
+        if(model.inInstructionMode()){
+
+            // TODO insert waiting time // ??????
+            view.launchDiscoveredPopup(
+                model.getPartnerAccount()!!.avatarId, model.getPartnerAccount()!!.name)
+            return
+        }
+
 
         if (mDiscovering) {
             startAdvertising()
@@ -114,6 +122,8 @@ class MainController(private val model: DataAccessLayer)
             stopAdvertising()
             stopDiscovering()
         }
+
+
     }
 
     fun acceptTheConnection() {
@@ -171,6 +181,13 @@ class MainController(private val model: DataAccessLayer)
     fun partnerInfoArrived(avartarId : Int, name : String) {
         model.updatePartnerAccount(avartarId, name)
         view.partnerFound(avartarId, name)
+    }
+
+    fun fillInstructionData(){
+        model.updatePartnerAccount(11,"Cupee")
+        model.updatePartnerAnswer(0, 0)
+        model.updatePartnerAnswer(1, 0)
+        model.updatePartnerAnswer(2, 3)
     }
 
 

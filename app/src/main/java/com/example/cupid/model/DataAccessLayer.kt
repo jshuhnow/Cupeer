@@ -18,8 +18,9 @@ class DataAccessLayer (
     private val questionRepository: QuestionRepository,
     private val messageRepository: MessageRepository
 ) {
-
     private val observers = mutableListOf<DomainObserver>()
+
+    private var instructionsMode = false
 
     fun register(observer: DomainObserver) = observers.add(observer)
 
@@ -75,6 +76,14 @@ class DataAccessLayer (
 
     fun getMessages() : ArrayList<Message> {
         return messageRepository.messages // TODO
+    }
+
+    fun setInstructionMode(active: Boolean){
+        this.instructionsMode = active
+    }
+
+    fun inInstructionMode() : Boolean{
+        return this.instructionsMode
     }
 
 
