@@ -5,7 +5,7 @@ import android.os.Handler
 import android.os.Parcelable
 import android.util.Log
 import com.example.cupid.R
-import com.example.cupid.controller.NearbyController.Companion.TAG
+
 import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.*
@@ -114,9 +114,6 @@ class MainController(private val model: DataAccessLayer)
     fun hitDiscoverButton() {
         mDiscovering = !mDiscovering
         view.updateClickListeners(mDiscovering)
-
-
-
 
         if (mDiscovering) {
 

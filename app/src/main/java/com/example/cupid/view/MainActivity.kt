@@ -131,8 +131,6 @@ class MainActivity() :
     }
 
     override fun updateGradientAnimation() {
-        
-      
         val backAnimation = main_layout.background as AnimationDrawable
         backAnimation.setEnterFadeDuration(10)
         backAnimation.setExitFadeDuration(3000)
@@ -187,7 +185,6 @@ class MainActivity() :
                     this.dismiss()
                 }
             }
-
 
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
