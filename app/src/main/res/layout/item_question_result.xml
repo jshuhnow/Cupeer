@@ -11,20 +11,20 @@
 
     <TextView
         android:id="@+id/text_result_question"
-        android:layout_width="169dp"
-        android:layout_height="91dp"
+        android:layout_width="281dp"
+        android:layout_height="85dp"
         android:fontFamily="@font/basic"
         android:text="Default Question text"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.307"
+        app:layout_constraintHorizontal_bias="0.353"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.181" />
+        app:layout_constraintVertical_bias="0.172" />
 
     <TextView
-        android:id="@+id/text_result_partneranswer"
+        android:id="@+id/text_result_youranswer"
         android:layout_width="257dp"
         android:layout_height="40dp"
         android:background="@drawable/result_speech_bubble"
@@ -42,7 +42,7 @@
         app:layout_constraintVertical_bias="0.911" />
 
     <TextView
-        android:id="@+id/text_result_partner"
+        android:id="@+id/text_result_you"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/basic"
@@ -66,10 +66,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.91"
-        app:srcCompat="@drawable/ic_element_11" />
+        app:srcCompat="@drawable/ic_element_7" />
 
     <TextView
-        android:id="@+id/text_result_youranswer"
+        android:id="@+id/text_result_partneranswer"
         android:layout_width="257dp"
         android:layout_height="40dp"
         android:background="@drawable/result_speech_bubble"
@@ -88,7 +88,7 @@
         app:layout_constraintVertical_bias="0.63" />
 
     <TextView
-        android:id="@+id/text_result_you"
+        android:id="@+id/text_result_partner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/basic"
@@ -112,6 +112,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.623"
-        app:srcCompat="@drawable/ic_element_7" />
+        app:srcCompat="@drawable/ic_element_11" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

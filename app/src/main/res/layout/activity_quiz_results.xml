@@ -42,9 +42,10 @@
             <Button
                 android:id="@+id/button_result_cancel"
                 android:layout_width="129dp"
-                android:layout_height="61dp"
+                android:layout_height="50dp"
+                android:background="@drawable/results_cancel_button"
                 android:text="@string/text_button_results_cancel"
-                android:textColor="#FFFDFD"
+                android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.191"

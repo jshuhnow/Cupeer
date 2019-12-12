@@ -3,12 +3,14 @@ package com.example.cupid.view
 
 import android.Manifest
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.Log
@@ -35,6 +37,7 @@ import com.google.android.gms.nearby.connection.Strategy.P2P_POINT_TO_POINT
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.dialog_discovered.*
+import kotlinx.android.synthetic.main.dialog_instructions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 
@@ -68,11 +71,19 @@ class MainActivity() :
         val drawerLayout: DrawerLayout = drawer_layout
 
         main_button_menu.setOnClickListener {
-            drawerLayout.openDrawer(Gravity.LEFT)
+            val myIntent = Intent(this, SettingsActivity::class.java)
+            this.startActivity(myIntent)
+            true
+            //drawerLayout.openDrawer(Gravity.LEFT)
         }
 
         main_button_debug.setOnClickListener {
-            launchDiscoveredPopup(2, "Bob")
+            if(controller.isDiscovering()){
+                controller.hitDiscoverButton()
+            }
+            controller.fillInstructionData()
+            controller.startInstructionDialog()
+
         }
 
         nav_menu.menu.findItem(R.id.nav_settings)
@@ -136,13 +147,10 @@ class MainActivity() :
             stripe_layout.startAnimation(anim)
             findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
 
-            controller.startDiscovering()
         } else {
             findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_inactive)
             stripe_layout.clearAnimation()
             findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation)
-
-            controller.stopDiscovering()
         }
         updateGradientAnimation()
     }
@@ -159,15 +167,27 @@ class MainActivity() :
 
             text_discover_name.text = partnerName
 
+
             button_discover_connect.setOnClickListener {
                 controller.acceptTheConnection()
                 this.dismiss()
             }
 
-            button_discover_close.setOnClickListener {
-                controller.rejectTheConnection()
-                this.dismiss()
+            if(model.inInstructionMode()){
+                this.setCancelable(false)
+            }else{
+
+                button_discover_close.setOnClickListener {
+                    controller.rejectTheConnection()
+                    this.dismiss()
+                }
+
+                this.setOnCancelListener {
+                    controller.rejectTheConnection()
+                    this.dismiss()
+                }
             }
+
 
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -179,15 +199,28 @@ class MainActivity() :
         waitingDialog = Dialog(this)
         with(waitingDialog!!) {
             setContentView(R.layout.dialog_waiting)
-            button_waiting_close.setOnClickListener {
-                this!!.dismiss()
-                returnToMain(this@MainActivity)
+            this.setCancelable(false)
+            if(model.inInstructionMode()){
+
+                Handler().postDelayed({
+                    proceedToNextStage()
+
+                }, 1500)
+
+            }else{
+                button_waiting_close.setOnClickListener {
+                    dismiss()
+                    // TODO disconnect logic
+                    returnToMain(this@MainActivity)
+                }
             }
+
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             show()
         }
     }
+
 
     override fun proceedToNextStage() {
         if (waitingDialog != null)
@@ -290,5 +323,9 @@ class MainActivity() :
 
     override fun partnerFound(avatarId: Int, name: String) {
         launchDiscoveredPopup(avatarId, name)
+    }
+
+    override fun onBackPressed() {
+
     }
 }

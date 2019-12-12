@@ -14,16 +14,16 @@ import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Message
 import com.example.cupid.view.adapters.ChatMessageListAdapter
 import com.example.cupid.view.data.MessageUI
+import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.activity_chat.*
 import com.example.cupid.view.utils.returnToMain
+import kotlinx.android.synthetic.main.activity_chat.view.*
 
 
 
 
 
 //TODO deal with cancelation on partners side -> launchRejectedPopup
-
-//TODO handle incoming chat messages -> addMessage(author: Account, payload: String)
 
 class ChatActivity : AppCompatActivity(), ChatView {
 
@@ -40,6 +40,10 @@ class ChatActivity : AppCompatActivity(), ChatView {
 
         controller.bind(this)
         controller.init()
+
+        // ease of access, refactor at some point
+        constraintLayout.image_chat_heading_partner.setImageResource(getAvatarFromId(this,model.getPartnerAccount()!!.avatarId))
+        constraintLayout.image_chat_heading_you.setImageResource(getAvatarFromId(this,model.getUserAccount()!!.avatarId))
 
         setClickListeners()
 
@@ -63,11 +67,18 @@ class ChatActivity : AppCompatActivity(), ChatView {
         messageRecycler = reyclerview_message_list
 
         layoutManager = LinearLayoutManager(this)
+
         (layoutManager as LinearLayoutManager).orientation = LinearLayoutManager.VERTICAL
+        if(messages.size > 0){
+            layoutManager!!.scrollToPosition(messages.size - 1)
+        }
+
         messageRecycler!!.layoutManager = layoutManager
 
         messageAdapter = ChatMessageListAdapter(this, messages)
         messageRecycler!!.adapter = messageAdapter
+
+
 
     }
 
@@ -84,15 +95,23 @@ class ChatActivity : AppCompatActivity(), ChatView {
 
         button_chatbox_send.setOnClickListener{
             var payload = edittext_chatbox.text.toString()
-            controller.sendMessage(Message(model.getUserAccount()!!, payload))
 
-            val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            while (payload.endsWith("\n")){
+                payload = payload.dropLast(1)
+            }
+
+            if (payload != ""){
+                controller.sendMessage(Message(model.getUserAccount()!!, payload))
+
+                val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
 
-            inputManager.hideSoftInputFromWindow(
-                currentFocus?.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS
-            )
+                inputManager.hideSoftInputFromWindow(
+                    currentFocus?.windowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS
+                )
+            }
+
 
 
         }
@@ -102,6 +121,10 @@ class ChatActivity : AppCompatActivity(), ChatView {
         edittext_chatbox.setText("")
     }
 
+
+    override fun onBackPressed() {
+
+    }
 
 }
 

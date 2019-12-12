@@ -1,5 +1,7 @@
 package com.example.cupid.controller
 
+import android.content.Context
+import android.os.Handler
 import android.os.Parcelable
 import android.util.Log
 import com.example.cupid.R
@@ -12,6 +14,7 @@ import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MainView
 import com.example.cupid.view.MyConnectionService
+import com.example.cupid.view.utils.launchInstructionPopup
 import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.google.android.gms.nearby.connection.Payload
 
@@ -20,6 +23,8 @@ class MainController(private val model: DataAccessLayer)
     private lateinit var view:MainView
     private var mDiscovering = false
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+
+    private var demoPopup = false
 
     companion object {
         const val TAG = "MainController"
@@ -57,6 +62,10 @@ class MainController(private val model: DataAccessLayer)
         mConnectionService.stopDiscovering()
     }
 
+    fun isDiscovering() : Boolean{
+        return mDiscovering
+    }
+
     private fun dataSetup() {
         model.addQuestions(
             "You win a lottery! What do you do with the money?",
@@ -72,7 +81,7 @@ class MainController(private val model: DataAccessLayer)
             arrayListOf(
                 "Study hard. ",
                 "At the last second. ",
-                "Ignore it and play",
+                "Ignore it and play!",
                 "Umm, what test?"
             )
         )
@@ -80,12 +89,12 @@ class MainController(private val model: DataAccessLayer)
             "A human hand extends out of a toilet! What would you do?",
             arrayListOf(
                 "Scream and run. ",
-                "Close the lid without a word",
+                "Close the lid without a word.",
                 "Flush frantically.",
                 "Shake hands with it."
             )
         )
-        model.updateUserAccount(1, "Alice")
+        model.updateUserAccount(6, "Alice")
     }
 
     fun updateUserInfo() {
@@ -106,19 +115,31 @@ class MainController(private val model: DataAccessLayer)
         mDiscovering = !mDiscovering
         view.updateClickListeners(mDiscovering)
 
-        if(model.inInstructionMode()){
 
-            // TODO insert waiting time // ??????
-            view.launchDiscoveredPopup(
-                model.getPartnerAccount()!!.avatarId, model.getPartnerAccount()!!.name)
-            return
-        }
 
 
         if (mDiscovering) {
-            startAdvertising()
-            startDiscovering()
+
+            if(model.inInstructionMode()){
+                if(!demoPopup){
+                    demoPopup = true
+                    Handler().postDelayed({
+                        if(mDiscovering){
+                            view.launchDiscoveredPopup(
+                                model.getPartnerAccount()!!.avatarId, model.getPartnerAccount()!!.name)
+                        }
+                        demoPopup = false
+
+                    }, 3000)
+                }
+                return
+            }else{
+                startAdvertising()
+                startDiscovering()
+            }
+
         } else {
+            if(model.inInstructionMode()){return}
             stopAdvertising()
             stopDiscovering()
         }
@@ -127,6 +148,13 @@ class MainController(private val model: DataAccessLayer)
     }
 
     fun acceptTheConnection() {
+
+        if(model.inInstructionMode()){
+            view.launchWaitingPopup()
+            return
+        }
+
+
         mConnectionService.send(ReplyToken(true, STAGE))
         val res = mConnectionService.pullNearbyPayload(this)
         if (res != null) {
@@ -138,6 +166,11 @@ class MainController(private val model: DataAccessLayer)
     }
 
     fun rejectTheConnection() {
+
+        if(model.inInstructionMode()){
+            return
+        }
+
         mConnectionService.send(ReplyToken(false, STAGE))
         mConnectionService.myDisconnect()
     }
@@ -188,6 +221,15 @@ class MainController(private val model: DataAccessLayer)
         model.updatePartnerAnswer(0, 0)
         model.updatePartnerAnswer(1, 0)
         model.updatePartnerAnswer(2, 3)
+    }
+
+    fun startInstructionDialog(){
+        model.setInstructionMode(true)
+        launchInstructionPopup(view as Context,
+            listOf((view as Context).resources.getString(R.string.demo_text_greeting1),
+                (view as Context).resources.getString(R.string.demo_text_greeting2),
+                (view as Context).resources.getString(R.string.demo_text_greeting3),
+                (view as Context).resources.getString(R.string.demo_text_greeting4)))
     }
 
 

@@ -1,11 +1,14 @@
 package com.example.cupid.controller
 
+import android.content.Context
 import android.util.Log
+import com.example.cupid.R
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.*
 import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MyConnectionService
 import com.example.cupid.view.QuizQuestionsView
+import com.example.cupid.view.utils.launchInstructionPopup
 
 class QuizQuestionsController (
     private val model : DataAccessLayer
@@ -24,14 +27,25 @@ class QuizQuestionsController (
 
     fun init() {
         view.showQuestions(model.getQuestions())
+
+        if(model.inInstructionMode()){
+            launchInstructionPopup(view as Context,
+                listOf((view as Context).resources.getString(R.string.demo_text_discovered1),
+                    (view as Context).resources.getString(R.string.demo_text_discovered2)))
+        }
+
     }
 
     fun chooseAnswer(questionId : Int, answerId : Int) {
         model.updateUserAnswer(questionId, answerId)
-        mConnectionService.send(Answer(questionId, answerId))
-        if (model.getUserAnswers().size >= 3) {
-            proceedToNextStage()
+
+        if (!model.inInstructionMode()){
+            mConnectionService.send(Answer(questionId, answerId))
+            if (model.getUserAnswers().size >= 3) {
+                proceedToNextStage()
+            }
         }
+
     }
 
     override fun newElementArrived(nearbyPayload: NearbyPayload) {

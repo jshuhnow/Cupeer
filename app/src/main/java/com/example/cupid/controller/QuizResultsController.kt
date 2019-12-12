@@ -1,6 +1,8 @@
 package com.example.cupid.controller
 
+import android.content.Context
 import android.util.Log
+import com.example.cupid.R
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Answer
@@ -9,6 +11,7 @@ import com.example.cupid.model.domain.ReplyToken
 import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MyConnectionService
 import com.example.cupid.view.QuizResultsView
+import com.example.cupid.view.utils.launchInstructionPopup
 
 class QuizResultsController(
     private val model : DataAccessLayer
@@ -31,6 +34,13 @@ class QuizResultsController(
             model.getPartnerAccount() as Account,
             model.getPartnerAnswers()
         )
+
+        if(model.inInstructionMode()){
+            launchInstructionPopup(view as Context,
+                listOf((view as Context).resources.getString(R.string.demo_text_results1),
+                    (view as Context).resources.getString(R.string.demo_text_results2)))
+        }
+
     }
 
     fun rejectTheConnection() {

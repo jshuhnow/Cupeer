@@ -89,7 +89,7 @@ class ChatMessageListAdapter(
             messageText.text = message.payload
             nameText.text = message.name
             timeText.text = ""
-            profileImage.setImageResource(getAvatarFromId(context,message.iconId))
+            profileImage.setBackgroundResource(getAvatarFromId(context,message.iconId))
         }
     }
 }

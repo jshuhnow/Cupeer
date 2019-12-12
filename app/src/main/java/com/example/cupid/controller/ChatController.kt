@@ -1,5 +1,7 @@
 package com.example.cupid.controller
 
+import android.content.Context
+import android.os.Handler
 import android.util.Log
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.Account
@@ -10,6 +12,11 @@ import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.ChatView
 import com.example.cupid.view.MyConnectionService
 import com.example.cupid.view.QuizResultsView
+import androidx.core.os.HandlerCompat.postDelayed
+import com.example.cupid.R
+import com.example.cupid.view.utils.getAvatarFromId
+import kotlinx.android.synthetic.main.activity_chat.*
+
 
 class ChatController(
     private val model : DataAccessLayer
@@ -29,6 +36,37 @@ class ChatController(
     fun init() {
         updateView()
         fetchMessage()
+
+
+        if(model.inInstructionMode()){
+
+            var messageList = listOf((view as Context).resources.getString(R.string.demo_text_chat1),
+                (view as Context).resources.getString(R.string.demo_text_chat2),
+                (view as Context).resources.getString(R.string.demo_text_chat3),
+                (view as Context).resources.getString(R.string.demo_text_chat4),
+                (view as Context).resources.getString(R.string.demo_text_chat5),
+                (view as Context).resources.getString(R.string.demo_text_chat6)
+            )
+
+            var messageDelays = listOf(2000,2700,4000,3000,4000,4000,0)
+
+            val handler = Handler()
+            handler.postDelayed(object : Runnable {
+
+                private var messageIndex = 0
+                override fun run() {
+
+                    if(messageIndex < messageList.size){
+                        addMessage(model.getPartnerAccount() as Account,messageList[messageIndex])
+
+                        handler.postDelayed(this, messageDelays[++messageIndex].toLong())
+
+                    }
+                }
+            }, messageDelays[0].toLong())
+
+
+        }
     }
 
     fun updateView() {
@@ -36,6 +74,7 @@ class ChatController(
             model.getMessages() as ArrayList<Message>,
             model.getUserAccount() as Account
         )
+
         view.clearTextView()
     }
     fun addMessage(author: Account, payload: String){

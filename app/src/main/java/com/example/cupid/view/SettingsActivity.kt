@@ -52,6 +52,8 @@ class SettingsActivity :
         spinner_settings_icon.setSelection(mIconId-1)
     }
 
+
+
     private fun setClickListeners(){
 
         button_settings_close.setOnClickListener {
@@ -174,5 +176,10 @@ class SettingsActivity :
     override fun writeUserInformation() {
         controller.writeUserInformation(mIconId, mName)
 
+    }
+
+    override fun onBackPressed() {
+        writeUserInformation()
+        finish()
     }
 }

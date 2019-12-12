@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -86,8 +87,9 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
         }
 
         button_result_cancel.setOnClickListener{
-            //TODO send cancel message to other person
-            controller.rejectTheConnection()
+            if(!model.inInstructionMode()) {
+                controller.rejectTheConnection()
+            }
             returnToMain(this)
         }
     }
@@ -97,13 +99,22 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
         waitingDialog = Dialog(this)
         waitingDialog!!.setContentView(R.layout.dialog_waiting)
+        waitingDialog!!.setCancelable(false)
+        if(model.inInstructionMode()){
 
+            Handler().postDelayed({
+                proceedToNextStage()
 
-        waitingDialog!!.button_waiting_close.setOnClickListener{
-            waitingDialog!!.dismiss()
-            controller.rejectTheConnection()
-            returnToMain(this)
+            }, 1500)
+
+        }else{
+            waitingDialog!!.button_waiting_close.setOnClickListener{
+                waitingDialog!!.dismiss()
+                controller.rejectTheConnection()
+                returnToMain(this)
+            }
         }
+
 
 
         waitingDialog!!.window!!.attributes.windowAnimations = R.style.DialogAnimation
@@ -117,6 +128,10 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
         }
         val myIntent = Intent(this, ChatActivity::class.java)
         this.startActivity(myIntent)
+
+    }
+
+    override fun onBackPressed() {
 
     }
 }

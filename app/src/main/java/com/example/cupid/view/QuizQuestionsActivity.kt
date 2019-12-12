@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import com.example.cupid.R
@@ -40,12 +41,15 @@ class QuizQuestionsActivity :
 
         controller.bind(this)
         controller.init()
+
     }
 
     override fun onCardDisappeared(view: View, position: Int) {
         if(layoutManager!!.topPosition == (mQuestions.size-1)){
-            //TODO this gets executed after all questions are answered -> nearby has to do something
-            //launchWaitingPopup()
+            if(model.inInstructionMode()){
+                launchWaitingPopup()
+            }
+
         }
     }
 
@@ -53,10 +57,20 @@ class QuizQuestionsActivity :
         waitingDialog = Dialog(this)
         with(waitingDialog!!) {
             setContentView(R.layout.dialog_waiting)
-            button_waiting_close.setOnClickListener{
-                this.dismiss()
-                controller.rejectTheConnection()
+            this.setCancelable(false)
+            if(model.inInstructionMode()){
+                Handler().postDelayed({
+                    proceedToNextStage()
+
+                }, 1500)
+
+            }else{
+                button_waiting_close.setOnClickListener{
+                    this.dismiss()
+                    controller.rejectTheConnection()
+                }
             }
+
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             show()
@@ -112,5 +126,9 @@ class QuizQuestionsActivity :
         )
 
         this@QuizQuestionsActivity.startActivity(myIntent)
+    }
+
+    override fun onBackPressed() {
+
     }
 }

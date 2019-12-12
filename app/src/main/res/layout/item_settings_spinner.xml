@@ -7,14 +7,14 @@
 
     <ImageView
         android:id="@+id/image_item_spinner_layout"
-        android:layout_width="50dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:padding="5dp"
         android:src="@drawable/ic_element_10" />
 
     <TextView
         android:id="@+id/text_item_spinner_layout"
-        android:layout_width="fill_parent"
+        android:layout_width="196dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:padding="@dimen/activity_horizontal_margin"

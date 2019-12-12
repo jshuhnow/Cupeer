@@ -27,16 +27,17 @@
         android:layout_weight="1"
         android:background="@android:color/transparent"
         android:hint="Name"
+        android:imeOptions="actionDone"
         android:maxLines="1"
+        android:singleLine="true"
+        android:textAlignment="center"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.42"
-        android:imeOptions="actionDone"
-        android:singleLine="true"/>
+        app:layout_constraintVertical_bias="0.42" />
 
     <Spinner
         android:id="@+id/spinner_settings_icon"
