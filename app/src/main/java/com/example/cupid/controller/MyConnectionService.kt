@@ -214,7 +214,9 @@ class MyConnectionService :
     override fun onAdvertisingStarted() {}
 
     /** Called when advertising fails to start. Override this method to act on the event.  */
-    override fun onAdvertisingFailed() {}
+    override fun onAdvertisingFailed() {
+        startAdvertising()
+    }
 
     /**
      * Called when a pending connection with a remote endpoint is created. Use [ConnectionInfo]
@@ -303,7 +305,9 @@ class MyConnectionService :
     override fun onDiscoveryStarted() {}
 
     /** Called when discovery fails to start. Override this method to act on the event.  */
-    override fun onDiscoveryFailed() {}
+    override fun onDiscoveryFailed() {
+        startDiscovering()
+    }
 
     /**
      * Called when a remote endpoint is discovered. To connect to the device, call [ ][.connectToEndpoint].
