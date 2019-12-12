@@ -50,6 +50,7 @@ class ChatActivity : AppCompatActivity(), ChatView {
     }
 
     override fun renderMessages(msgs: ArrayList<Message>, user: Account){
+        // TODO: the partner leaves the room either with or without the greenlight (#21)
 
         var messages: ArrayList<MessageUI> = arrayListOf()
 
@@ -85,12 +86,13 @@ class ChatActivity : AppCompatActivity(), ChatView {
     private fun setClickListeners(){
 
         button_chat_found.setOnClickListener{
-            returnToMain(this)
+            controller.sendCue(true)
+            controller.terminateTheConnection()
         }
 
         button_chat_close.setOnClickListener {
-            // TODO send the other person the "rejection" message
-            returnToMain(this)
+            controller.sendCue(false)
+            controller.terminateTheConnection()
         }
 
         button_chatbox_send.setOnClickListener{
@@ -124,6 +126,10 @@ class ChatActivity : AppCompatActivity(), ChatView {
 
     override fun onBackPressed() {
 
+    }
+
+    override fun returnToMain() {
+        returnToMain(this)
     }
 
 }

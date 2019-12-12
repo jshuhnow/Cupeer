@@ -12,6 +12,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.nearby.connection.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -384,7 +385,11 @@ class MyConnectionService :
      * Called when a connection with this endpoint has failed. Override this method to act on the
      * event.
      */
-    fun onConnectionFailed(endpoint: Endpoint?) {}
+    fun onConnectionFailed(endpoint: Endpoint?) {
+        val r = Random()
+        TimeUnit.MILLISECONDS.sleep(r.nextInt(1500).toLong())
+        connectToEndpoint(endpoint!!)
+    }
 
     /** Called when someone has connected to us. Override this method to act on the event.  */
     fun onEndpointConnected(endpoint: Endpoint) {

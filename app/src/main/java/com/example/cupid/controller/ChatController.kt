@@ -1,20 +1,19 @@
 package com.example.cupid.controller
 
+import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.util.Log
 import com.example.cupid.model.DataAccessLayer
-import com.example.cupid.model.domain.Account
-import com.example.cupid.model.domain.Message
-import com.example.cupid.model.domain.NearbyPayload
-import com.example.cupid.model.domain.ReplyToken
 import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.ChatView
 import com.example.cupid.view.MyConnectionService
 import com.example.cupid.view.QuizResultsView
 import androidx.core.os.HandlerCompat.postDelayed
 import com.example.cupid.R
+import com.example.cupid.model.domain.*
 import com.example.cupid.view.utils.getAvatarFromId
+import com.example.cupid.view.utils.returnToMain
 import kotlinx.android.synthetic.main.activity_chat.*
 
 
@@ -65,11 +64,12 @@ class ChatController(
                 }
             }, messageDelays[0].toLong())
 
-
+            // TODO: the partner leaves the room either with or without the greenlight (#21)
         }
     }
 
     fun updateView() {
+
         view.renderMessages(
             model.getMessages() as ArrayList<Message>,
             model.getUserAccount() as Account
@@ -77,9 +77,11 @@ class ChatController(
 
         view.clearTextView()
     }
-    fun addMessage(author: Account, payload: String){
+
+    // unless otherwise noted, the message type is MessageType.USER
+    fun addMessage(author: Account, payload: String, type : MessageType = MessageType.USER){
         model.getMessages()!!.add(
-            Message (0, author, payload, arrayListOf<Account>()))
+            Message (0, author, payload, type, arrayListOf<Account>()))
         updateView()
     }
 
@@ -88,56 +90,55 @@ class ChatController(
         addMessage(message.owner, message.payload)
     }
 
-    fun rejectTheConnection() {
+    fun sendCue(isGreenLight : Boolean) {
+        mConnectionService.send(Message(
+            model.getUserAccount()!!,
+            if (isGreenLight) SystemMessageString.GREENLIGHT else SystemMessageString.NO_GREENLIGHT,
+            MessageType.SYSTEM
+        ))
+    }
+
+    private fun processNearbyPayload(nearbyPayload : NearbyPayload) {
+        when (nearbyPayload.type) {
+            "Message" -> {
+                val message = nearbyPayload.obj as Message
+                addMessage(message.owner, message.payload, message.type)
+
+                // One more
+                fetchMessage()
+            }
+            "ReplyToken" -> {
+                val replyToken = nearbyPayload.obj as ReplyToken
+                processReplyToken(replyToken)
+            }
+            else -> {
+                Log.d(MainController.TAG, "NearbyPayload of unexpected type")
+            }
+        }
+    }
+
+    fun terminateTheConnection() {
         mConnectionService.send(ReplyToken(false, STAGE))
         mConnectionService.myDisconnect()
-        //TODO view.goback()
     }
 
-    fun fetchMessage() {
-        val res = mConnectionService.pullNearbyPayload(this)
-        if (res == null) {
-            return
-        }
-
-        if (res.type == "Message") {
-            val message = res.obj as Message
-            addMessage(message.owner, message.payload)
-
-            // One more
-            fetchMessage()
-        } else if (res.type == "ReplyToken") {
-            val replyToken = res.obj as ReplyToken
-            processReplyToken(replyToken)
-        } else {
-            Log.d(MainController.TAG, "NearbyPayload of unexpected type")
-        }
+    private fun fetchMessage() {
+        val nearbyPayload = mConnectionService.pullNearbyPayload(this) ?: return
+        processNearbyPayload(nearbyPayload)
     }
+
 
     override fun newElementArrived(nearbyPayload: NearbyPayload) {
-        if (nearbyPayload.type == "Message") {
-            val message = nearbyPayload.obj as Message
-            addMessage(message.owner, message.payload)
-
-            // One more
-            fetchMessage()
-        } else if (nearbyPayload.type == "ReplyToken") {
-            val replyToken = nearbyPayload.obj as ReplyToken
-            processReplyToken(replyToken)
-        } else {
-            Log.d(MainController.TAG, "NearbyPayload of unexpected type")
-        }
-
+        processNearbyPayload(nearbyPayload)
     }
 
     fun processReplyToken(replyToken : ReplyToken) {
         if (replyToken.stage == MainController.STAGE) {
             if (replyToken.isAccepted == false) {
-                rejectTheConnection()
+                terminateTheConnection()
             }
         } else {
             Log.d(MainController.TAG, "ReplyToken of unexpected stage")
         }
     }
-
 }
