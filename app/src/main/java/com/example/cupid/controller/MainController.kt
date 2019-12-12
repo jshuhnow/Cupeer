@@ -42,10 +42,9 @@ class MainController(private val model: DataAccessLayer)
     }
 
     fun startAdvertising() {
-        mConnectionService.startAdvertising()
         mConnectionService
             .registerNearbyNewPartnerFoundObserver(this)
-
+        mConnectionService.startAdvertising()
     }
 
     fun stopAdvertising() {
