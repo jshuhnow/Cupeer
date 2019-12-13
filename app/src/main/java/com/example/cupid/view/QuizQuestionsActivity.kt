@@ -15,6 +15,7 @@ import com.example.cupid.model.ModelModule
 import com.example.cupid.model.domain.Question
 import com.example.cupid.view.adapters.QuestionCardStackAdapter
 import com.example.cupid.view.data.QuestionUI
+import com.example.cupid.view.views.QuizQuestionsView
 import com.yuyakaido.android.cardstackview.*
 import kotlinx.android.synthetic.main.activity_quiz_questions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*

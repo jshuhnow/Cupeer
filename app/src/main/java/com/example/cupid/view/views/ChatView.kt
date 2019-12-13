@@ -1,4 +1,4 @@
-package com.example.cupid.view
+package com.example.cupid.view.views
 
 import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Message

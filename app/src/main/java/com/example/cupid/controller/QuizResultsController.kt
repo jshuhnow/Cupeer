@@ -5,12 +5,11 @@ import android.util.Log
 import com.example.cupid.R
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.Account
-import com.example.cupid.model.domain.Answer
 import com.example.cupid.model.domain.NearbyPayload
 import com.example.cupid.model.domain.ReplyToken
 import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MyConnectionService
-import com.example.cupid.view.QuizResultsView
+import com.example.cupid.view.views.QuizResultsView
 import com.example.cupid.view.utils.launchInstructionPopup
 
 class QuizResultsController(

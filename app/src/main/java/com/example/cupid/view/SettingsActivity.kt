@@ -7,8 +7,6 @@ import com.example.cupid.R
 import kotlinx.android.synthetic.main.settings_activity.*
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.view.Display
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -18,10 +16,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.example.cupid.controller.SettingsController
 import com.example.cupid.model.ModelModule
+import com.example.cupid.view.views.SettingsView
 
 
 class SettingsActivity :
-    AppCompatActivity(), AdapterView.OnItemSelectedListener, SettingsView {
+    AppCompatActivity(), AdapterView.OnItemSelectedListener,
+    SettingsView {
 
     private val model = ModelModule.dataAccessLayer
     private val controller = SettingsController(model)

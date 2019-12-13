@@ -86,5 +86,12 @@ class DataAccessLayer (
         return this.instructionsMode
     }
 
+    fun reset(){
+        questionRepository.questions = arrayListOf()
+        messageRepository.messages = arrayListOf()
+        instructionsMode = false
+        accountRepository.partnerAccount  = null
+    }
+
 
 }

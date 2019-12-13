@@ -1,4 +1,4 @@
-package com.example.cupid.view
+package com.example.cupid.view.views
 
 interface MainView {
     fun updateUserInfo(avatarId: Int, name : String)

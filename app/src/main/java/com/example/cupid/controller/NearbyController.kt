@@ -4,11 +4,8 @@ import android.content.Context
 import android.content.IntentSender
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.example.cupid.model.DataAccessLayer
-import com.example.cupid.view.MainActivity
-import com.example.cupid.view.NearbyView
+import com.example.cupid.view.views.NearbyView
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResultCallback

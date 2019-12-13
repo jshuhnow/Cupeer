@@ -1,8 +1,7 @@
 package com.example.cupid.controller
 
 import com.example.cupid.model.DataAccessLayer
-import com.example.cupid.model.domain.Account
-import com.example.cupid.view.SettingsView
+import com.example.cupid.view.views.SettingsView
 
 class SettingsController(
     private val model : DataAccessLayer

@@ -1,6 +1,7 @@
 package com.example.cupid.view.adapters
 
 import android.app.Activity
+import android.graphics.Color
 import com.example.cupid.R
 import android.view.LayoutInflater
 import android.view.View
@@ -34,11 +35,13 @@ class QuestionCardStackAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val question = questions[position]
         holder.question.text = question.questionText
-        holder.answer1.text = question.choices[0]
-        holder.answer2.text = question.choices[1]
-        holder.answer3.text = question.choices[2]
-        holder.answer4.text = question.choices[3]
 
+        val questionViews = arrayListOf(
+            holder.answer1,
+            holder.answer2,
+            holder.answer3,
+            holder.answer4
+        )
 
         val bgColors = listOf(
             R.color.gradientEndActive,
@@ -48,22 +51,26 @@ class QuestionCardStackAdapter(
         holder.itemView.layout_quiz_question.background = context!!.getDrawable(bgColors[position])
 
 
-        holder.itemView.text_quiz_answer1.setOnClickListener {
-            controller.chooseAnswer(position, 0)
+        questionViews.forEachIndexed { i, element ->
+            renderAnswerOption(element,question, position, i)
+        }
+
+    }
+
+    private fun renderAnswerOption(textView : TextView,question: QuestionUI, position: Int, answerIndex : Int){
+
+        textView.text = question.choices[answerIndex]
+
+        if (question.choices[answerIndex] == ""){
+            textView.setBackgroundColor(Color.TRANSPARENT)
+            return
+        }
+
+        textView.setOnClickListener {
+            controller.chooseAnswer(position, answerIndex)
             cardViewStack!!.swipe()
         }
-        holder.itemView.text_quiz_answer2.setOnClickListener {
-            controller.chooseAnswer(position, 1)
-            cardViewStack!!.swipe()
-        }
-        holder.itemView.text_quiz_answer3.setOnClickListener {
-            controller.chooseAnswer(position, 2)
-            cardViewStack!!.swipe()
-        }
-        holder.itemView.text_quiz_answer4.setOnClickListener {
-            controller.chooseAnswer(position, 3)
-            cardViewStack!!.swipe()
-        }
+
     }
 
     override fun getItemCount(): Int {

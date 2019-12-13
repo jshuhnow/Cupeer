@@ -6,20 +6,28 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.View
 import com.example.cupid.R
+import com.example.cupid.model.DataAccessLayer
+import com.example.cupid.model.ModelModule
 import com.example.cupid.view.MainActivity
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_instructions.*
 import kotlinx.android.synthetic.main.dialog_rejection.*
 
 fun returnToMain(activity: Activity){
+
+    val model = ModelModule.dataAccessLayer
+
     val intents = Intent(activity, MainActivity::class.java)
     intents.addFlags(
         Intent.FLAG_ACTIVITY_NEW_TASK
                 or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 or Intent.FLAG_ACTIVITY_CLEAR_TASK
     )
+    model.reset()
+    Log.d("Test", model.getMessages().toString())
     activity.startActivity(intents)
     activity.finish()
 }

@@ -8,7 +8,6 @@ import com.example.cupid.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cupid.controller.ChatController
-import com.example.cupid.controller.QuizQuestionsController
 import com.example.cupid.model.ModelModule
 import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Message
@@ -17,6 +16,7 @@ import com.example.cupid.view.data.MessageUI
 import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.activity_chat.*
 import com.example.cupid.view.utils.returnToMain
+import com.example.cupid.view.views.ChatView
 import kotlinx.android.synthetic.main.activity_chat.view.*
 
 

@@ -2,25 +2,22 @@ package com.example.cupid.controller
 
 import android.content.Context
 import android.os.Handler
-import android.os.Parcelable
 import android.util.Log
 import com.example.cupid.R
-import com.example.cupid.controller.NearbyController.Companion.TAG
-import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.DataAccessLayer
+import com.example.cupid.model.QuestionBankModule
 import com.example.cupid.model.domain.*
 
 import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
 import com.example.cupid.model.observer.QueueObserver
-import com.example.cupid.view.MainView
+import com.example.cupid.view.views.MainView
 import com.example.cupid.view.MyConnectionService
 import com.example.cupid.view.utils.launchInstructionPopup
 import com.google.android.gms.nearby.connection.ConnectionsClient
-import com.google.android.gms.nearby.connection.Payload
 
 class MainController(private val model: DataAccessLayer)
     : NearbyNewPartnerFoundObserver, QueueObserver {
-    private lateinit var view:MainView
+    private lateinit var view: MainView
     private var mDiscovering = false
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
 
@@ -65,35 +62,22 @@ class MainController(private val model: DataAccessLayer)
     fun isDiscovering() : Boolean{
         return mDiscovering
     }
+    var questionBank  = QuestionBankModule.questionBank
 
     private fun dataSetup() {
-        model.addQuestions(
-            "You win a lottery! What do you do with the money?",
-            arrayListOf(
-                "Spend it now!",
-                "Better save it.",
-                "Give it away.",
-                "Somehow lose it."
+
+        // Generating questions. TODO: Move this after reworking the randomized questions
+
+
+        for (i in 0..2){
+            model.addQuestions(
+                questionBank[i].first,
+                questionBank[i].second
             )
-        )
-        model.addQuestions(
-            "A test is coming up. How do you study for it?",
-            arrayListOf(
-                "Study hard. ",
-                "At the last second. ",
-                "Ignore it and play!",
-                "Umm, what test?"
-            )
-        )
-        model.addQuestions(
-            "A human hand extends out of a toilet! What would you do?",
-            arrayListOf(
-                "Scream and run. ",
-                "Close the lid without a word.",
-                "Flush frantically.",
-                "Shake hands with it."
-            )
-        )
+        }
+
+
+
         model.updateUserAccount(6, "Alice")
     }
 
@@ -220,7 +204,7 @@ class MainController(private val model: DataAccessLayer)
         model.updatePartnerAccount(11,"Cupee")
         model.updatePartnerAnswer(0, 0)
         model.updatePartnerAnswer(1, 0)
-        model.updatePartnerAnswer(2, 3)
+        model.updatePartnerAnswer(2, 0)
     }
 
     fun startInstructionDialog(){

@@ -19,8 +19,8 @@ import com.example.cupid.model.domain.Answer
 import com.example.cupid.model.domain.Question
 import com.example.cupid.view.adapters.ResultListAdapter
 import com.example.cupid.view.data.ResultUI
-import com.example.cupid.view.utils.launchRejectedPopup
 import com.example.cupid.view.utils.returnToMain
+import com.example.cupid.view.views.QuizResultsView
 import kotlinx.android.synthetic.main.activity_quiz_results.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 

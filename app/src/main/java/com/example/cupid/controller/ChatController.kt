@@ -9,13 +9,9 @@ import com.example.cupid.model.domain.Message
 import com.example.cupid.model.domain.NearbyPayload
 import com.example.cupid.model.domain.ReplyToken
 import com.example.cupid.model.observer.QueueObserver
-import com.example.cupid.view.ChatView
+import com.example.cupid.view.views.ChatView
 import com.example.cupid.view.MyConnectionService
-import com.example.cupid.view.QuizResultsView
-import androidx.core.os.HandlerCompat.postDelayed
 import com.example.cupid.R
-import com.example.cupid.view.utils.getAvatarFromId
-import kotlinx.android.synthetic.main.activity_chat.*
 
 
 class ChatController(
@@ -56,7 +52,7 @@ class ChatController(
                 private var messageIndex = 0
                 override fun run() {
 
-                    if(messageIndex < messageList.size){
+                    if(messageIndex < messageList.size && model.inInstructionMode()){
                         addMessage(model.getPartnerAccount() as Account,messageList[messageIndex])
 
                         handler.postDelayed(this, messageDelays[++messageIndex].toLong())
@@ -78,7 +74,7 @@ class ChatController(
         view.clearTextView()
     }
     fun addMessage(author: Account, payload: String){
-        model.getMessages()!!.add(
+        model.getMessages().add(
             Message (0, author, payload, arrayListOf<Account>()))
         updateView()
     }

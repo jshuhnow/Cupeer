@@ -3,7 +3,6 @@ package com.example.cupid.view
 
 import android.Manifest
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -11,10 +10,6 @@ import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
-import android.os.Parcel
-import android.os.Parcelable
-import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
@@ -26,18 +21,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.example.cupid.R
 import com.example.cupid.controller.MainController
 import com.example.cupid.model.ModelModule
-import com.example.cupid.model.observer.*
 import com.example.cupid.view.utils.getAvatarFromId
 import com.example.cupid.view.utils.returnToMain
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.api.GoogleApiClient
+import com.example.cupid.view.views.MainView
 import com.google.android.gms.nearby.Nearby
-import com.google.android.gms.nearby.connection.*
-import com.google.android.gms.nearby.connection.Strategy.P2P_POINT_TO_POINT
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.dialog_discovered.*
-import kotlinx.android.synthetic.main.dialog_instructions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
 

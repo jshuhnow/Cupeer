@@ -7,7 +7,7 @@ import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.*
 import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MyConnectionService
-import com.example.cupid.view.QuizQuestionsView
+import com.example.cupid.view.views.QuizQuestionsView
 import com.example.cupid.view.utils.launchInstructionPopup
 
 class QuizQuestionsController (
