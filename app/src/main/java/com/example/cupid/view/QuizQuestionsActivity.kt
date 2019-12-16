@@ -18,6 +18,7 @@ import com.example.cupid.view.data.QuestionUI
 import com.yuyakaido.android.cardstackview.*
 import kotlinx.android.synthetic.main.activity_quiz_questions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
+import com.example.cupid.controller.ControllerModule.quizQuestionsController
 
 class QuizQuestionsActivity :
     AppCompatActivity(),
@@ -25,7 +26,7 @@ class QuizQuestionsActivity :
     QuizQuestionsView
 {
     private val model = ModelModule.dataAccessLayer
-    private val controller = QuizQuestionsController(model)
+    private val controller = quizQuestionsController()
 
     private var questionCardStackAdapter : QuestionCardStackAdapter? = null
     private var layoutManager : CardStackLayoutManager? = null

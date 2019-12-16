@@ -40,7 +40,7 @@ import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_instructions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
-
+import com.example.cupid.controller.ControllerModule.mainController
 
 class MainActivity() :
     AppCompatActivity(),
@@ -48,7 +48,7 @@ class MainActivity() :
 {
 
     private val model = ModelModule.dataAccessLayer
-    private val controller = MainController(model)
+    private val controller = mainController()
 
     private val MULTIPLE_PERMISSIONS = 1
     private var waitingDialog : Dialog? = null
@@ -304,8 +304,6 @@ class MainActivity() :
                 } else {
                     // One of the permission has not been granted
                 }
-
-                // TODO: update view
 
                 return
             }

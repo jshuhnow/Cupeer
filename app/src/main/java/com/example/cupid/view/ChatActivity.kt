@@ -7,8 +7,6 @@ import android.view.inputmethod.InputMethodManager
 import com.example.cupid.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.cupid.controller.ChatController
-import com.example.cupid.controller.QuizQuestionsController
 import com.example.cupid.model.ModelModule
 import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Message
@@ -18,6 +16,7 @@ import com.example.cupid.view.utils.getAvatarFromId
 import kotlinx.android.synthetic.main.activity_chat.*
 import com.example.cupid.view.utils.returnToMain
 import kotlinx.android.synthetic.main.activity_chat.view.*
+import com.example.cupid.controller.ControllerModule.chatController
 
 
 
@@ -32,7 +31,7 @@ class ChatActivity : AppCompatActivity(), ChatView {
     private var layoutManager : RecyclerView.LayoutManager? = null
 
     private val model = ModelModule.dataAccessLayer
-    private val controller = ChatController(model)
+    private val controller = chatController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +51,7 @@ class ChatActivity : AppCompatActivity(), ChatView {
     override fun renderMessages(msgs: ArrayList<Message>, user: Account){
         // TODO: the partner leaves the room either with or without the greenlight (#21)
 
-        var messages: ArrayList<MessageUI> = arrayListOf()
+        val messages: ArrayList<MessageUI> = arrayListOf()
 
         for (msg in msgs) {
             messages.add(MessageUI (

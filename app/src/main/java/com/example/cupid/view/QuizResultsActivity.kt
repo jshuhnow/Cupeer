@@ -23,6 +23,7 @@ import com.example.cupid.view.data.ResultUI
 import com.example.cupid.view.utils.returnToMain
 import kotlinx.android.synthetic.main.activity_quiz_results.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
+import com.example.cupid.controller.ControllerModule.quizResultsController
 
 class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
@@ -31,7 +32,7 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
     private var resultRecyclerView : RecyclerView? = null
 
     private var model : DataAccessLayer = ModelModule.dataAccessLayer
-    private var controller : QuizResultsController = QuizResultsController(model)
+    private var controller : QuizResultsController = quizResultsController()
 
     private var waitingDialog : Dialog? = null
 
