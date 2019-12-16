@@ -15,7 +15,7 @@ import com.example.cupid.view.utils.launchInstructionPopup
 
 class QuizResultsController(
     private val model : DataAccessLayer
-) : QueueObserver {
+) : NearbyController {
     private lateinit var view : QuizResultsView
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
 
@@ -43,7 +43,7 @@ class QuizResultsController(
 
     }
 
-    fun rejectTheConnection() {
+    override fun rejectTheConnection() {
         mConnectionService.send(ReplyToken(false, QuizQuestionsController.STAGE))
         mConnectionService.myDisconnect()
     }
@@ -54,8 +54,8 @@ class QuizResultsController(
         }
     }
 
-    fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage == STAGE) {
+    override fun processReplyToken(replyToken : ReplyToken) {
+        if (replyToken.stage <= STAGE) {
             if (replyToken.isAccepted) {
                 view.proceedToNextStage()
             } else {
@@ -65,7 +65,7 @@ class QuizResultsController(
             Log.d(MainController.TAG, "ReplyToken of unexpected stage")
         }
     }
-    fun proceedToNextStage() {
+    override fun proceedToNextStage() {
         mConnectionService.send(ReplyToken(true, STAGE))
 
         val res = mConnectionService.pullNearbyPayload(this)

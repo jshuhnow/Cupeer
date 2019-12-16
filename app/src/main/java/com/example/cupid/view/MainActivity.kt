@@ -68,13 +68,9 @@ class MainActivity() :
         controller.bind(this)
         controller.init()
 
-        val drawerLayout: DrawerLayout = drawer_layout
-
         main_button_menu.setOnClickListener {
             val myIntent = Intent(this, SettingsActivity::class.java)
             this.startActivity(myIntent)
-            true
-            //drawerLayout.openDrawer(Gravity.LEFT)
         }
 
         main_button_debug.setOnClickListener {
@@ -216,6 +212,10 @@ class MainActivity() :
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             show()
         }
+    }
+
+    override fun launchRejectedPopup() {
+        com.example.cupid.view.utils.launchRejectedPopup(this)
     }
 
 

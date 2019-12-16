@@ -19,7 +19,7 @@ import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.google.android.gms.nearby.connection.Payload
 
 class MainController(private val model: DataAccessLayer)
-    : NearbyNewPartnerFoundObserver, QueueObserver {
+    : NearbyNewPartnerFoundObserver, NearbyController {
     private lateinit var view:MainView
     private var mDiscovering = false
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
@@ -161,7 +161,7 @@ class MainController(private val model: DataAccessLayer)
         }
     }
 
-    fun rejectTheConnection() {
+    override fun rejectTheConnection() {
 
         if(model.inInstructionMode()){
             return
@@ -171,17 +171,22 @@ class MainController(private val model: DataAccessLayer)
         mConnectionService.myDisconnect()
     }
 
-    fun processReplyToken(replyToken : ReplyToken) {
+    override fun processReplyToken(replyToken : ReplyToken) {
         if (replyToken.stage == STAGE) {
             if (replyToken.isAccepted) {
-                view.proceedToNextStage()
+                proceedToNextStage()
             } else {
-                // go back
+
             }
         } else {
             Log.d(TAG, "ReplyToken of unexpected stage")
         }
     }
+
+    override fun proceedToNextStage() {
+        view.proceedToNextStage()
+    }
+
     override fun newPartnerfound() {
 
         mConnectionService.send(model.getUserAccount()!!)

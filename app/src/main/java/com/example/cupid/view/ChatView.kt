@@ -7,4 +7,5 @@ interface ChatView {
     fun renderMessages(msgs: ArrayList<Message>, user: Account){}
     fun clearTextView()
     fun returnToMain()
+    fun launchRejectedPopup()
 }

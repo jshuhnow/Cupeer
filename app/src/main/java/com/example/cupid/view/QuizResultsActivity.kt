@@ -19,7 +19,7 @@ import com.example.cupid.model.domain.Answer
 import com.example.cupid.model.domain.Question
 import com.example.cupid.view.adapters.ResultListAdapter
 import com.example.cupid.view.data.ResultUI
-import com.example.cupid.view.utils.launchRejectedPopup
+
 import com.example.cupid.view.utils.returnToMain
 import kotlinx.android.synthetic.main.activity_quiz_results.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
@@ -120,6 +120,10 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
         waitingDialog!!.window!!.attributes.windowAnimations = R.style.DialogAnimation
         waitingDialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         waitingDialog!!.show()
+    }
+
+    override fun launchRejectedPopup() {
+        com.example.cupid.view.utils.launchRejectedPopup(this)
     }
 
     override fun proceedToNextStage() {

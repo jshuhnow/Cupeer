@@ -77,6 +77,10 @@ class QuizQuestionsActivity :
         }
     }
 
+    override fun launchRejectedPopup() {
+        com.example.cupid.view.utils.launchRejectedPopup(this)
+    }
+
     override fun onCardDragging(direction: Direction, ratio: Float) {}
 
     override fun onCardSwiped(direction: Direction) {}

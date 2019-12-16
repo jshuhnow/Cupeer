@@ -132,5 +132,9 @@ class ChatActivity : AppCompatActivity(), ChatView {
         returnToMain(this)
     }
 
+    override fun launchRejectedPopup() {
+        com.example.cupid.view.utils.launchRejectedPopup(this)
+    }
+
 }
 

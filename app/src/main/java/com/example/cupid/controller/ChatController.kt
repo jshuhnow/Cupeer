@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.activity_chat.*
 
 class ChatController(
     private val model : DataAccessLayer
-) : QueueObserver {
+) : NearbyController {
     private lateinit var view : ChatView
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
 
@@ -71,7 +71,7 @@ class ChatController(
     fun updateView() {
 
         view.renderMessages(
-            model.getMessages() as ArrayList<Message>,
+            model.getMessages(),
             model.getUserAccount() as Account
         )
 
@@ -80,7 +80,7 @@ class ChatController(
 
     // unless otherwise noted, the message type is MessageType.USER
     fun addMessage(author: Account, payload: String, type : MessageType = MessageType.USER){
-        model.getMessages()!!.add(
+        model.getMessages().add(
             Message (0, author, payload, type, arrayListOf<Account>()))
         updateView()
     }
@@ -132,13 +132,24 @@ class ChatController(
         processNearbyPayload(nearbyPayload)
     }
 
-    fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage == MainController.STAGE) {
+    override fun processReplyToken(replyToken : ReplyToken) {
+        if (replyToken.stage <= MainController.STAGE) {
             if (replyToken.isAccepted == false) {
                 terminateTheConnection()
+
             }
         } else {
             Log.d(MainController.TAG, "ReplyToken of unexpected stage")
         }
     }
+
+    override fun proceedToNextStage() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun rejectTheConnection() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+
 }

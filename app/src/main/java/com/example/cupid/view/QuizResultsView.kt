@@ -13,5 +13,6 @@ interface QuizResultsView {
 
     }
     fun launchWaitingPopup()
+    fun launchRejectedPopup()
     fun proceedToNextStage()
 }

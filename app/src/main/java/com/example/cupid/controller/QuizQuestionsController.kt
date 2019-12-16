@@ -12,7 +12,7 @@ import com.example.cupid.view.utils.launchInstructionPopup
 
 class QuizQuestionsController (
     private val model : DataAccessLayer
-) : QueueObserver {
+) : NearbyController {
     private lateinit var view : QuizQuestionsView
     private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
 
@@ -60,8 +60,8 @@ class QuizQuestionsController (
     fun answerArrived(answer : Answer) {
         model.updatePartnerAnswer(answer.questionId, answer.answerId)
     }
-    fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage == STAGE) {
+    override fun processReplyToken(replyToken : ReplyToken) {
+        if (replyToken.stage <= STAGE) {
             if (replyToken.isAccepted) {
                 view.proceedToNextStage()
             } else {
@@ -72,11 +72,12 @@ class QuizQuestionsController (
         }
     }
 
-    fun rejectTheConnection() {
+    override fun rejectTheConnection() {
         mConnectionService.send(ReplyToken(false, STAGE))
         mConnectionService.myDisconnect()
     }
-    fun proceedToNextStage() {
+
+    override fun proceedToNextStage() {
         mConnectionService.send(ReplyToken(true, STAGE))
         for (i in 0 until 3) {
             val res = mConnectionService.pullNearbyPayload(this)

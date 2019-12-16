@@ -7,6 +7,7 @@ interface MainView {
     fun updateClickListeners(mDiscovering : Boolean )
     fun checkPermissions() : Boolean
     fun launchWaitingPopup()
+    fun launchRejectedPopup()
     fun partnerFound(avatarId: Int, name: String)
     fun proceedToNextStage()
 }

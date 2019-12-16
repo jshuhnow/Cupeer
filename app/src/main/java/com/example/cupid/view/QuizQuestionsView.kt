@@ -6,4 +6,5 @@ interface QuizQuestionsView {
     fun showQuestions(questions : ArrayList<Question>?)
     fun proceedToNextStage()
     fun launchWaitingPopup()
+    fun launchRejectedPopup()
 }
