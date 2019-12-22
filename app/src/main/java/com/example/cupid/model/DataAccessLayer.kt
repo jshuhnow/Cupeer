@@ -12,43 +12,33 @@ import com.example.cupid.model.observer.QuestionObserver
 import com.example.cupid.model.repository.AccountRepository
 import com.example.cupid.model.repository.MessageRepository
 import com.example.cupid.model.repository.QuestionRepository
+import java.util.concurrent.locks.ReentrantLock
 
 class DataAccessLayer (
     private val accountRepository: AccountRepository,
     private val questionRepository: QuestionRepository,
     private val messageRepository: MessageRepository
 ) {
-    private val observers = mutableListOf<DomainObserver>()
-
     private var instructionsMode = false
 
-    fun register(observer: DomainObserver) = observers.add(observer)
-
-    fun unregister(observer: DomainObserver) = observers.remove(observer)
-
-    private fun notify(action: (AccountObserver) -> Unit) {
-        observers.filterIsInstance<AccountObserver>().onEach { action(it) }
-    }
-
-    fun getUserName() = accountRepository.userAccount!!.name
     fun getUserAccount() = accountRepository.userAccount
     fun getPartnerAccount() = accountRepository.partnerAccount
 
-    fun updateUserAccount(avartarId: Int,
+    fun updateUserAccount(avatarId: Int,
                           name : String) {
-        accountRepository.userAccount = Account(name=name, avatarId= avartarId)
-        notify(AccountObserver::userAccountUpdated)
+        accountRepository.userAccount = Account(name=name, avatarId= avatarId)
     }
 
-    fun updatePartnerAccount(avartarId : Int,
+    fun updatePartnerAccount(avatarId : Int,
                       name : String) {
-        accountRepository.partnerAccount = Account(name=name, avatarId=avartarId)
+        accountRepository.partnerAccount = Account(name=name, avatarId=avatarId)
     }
 
     fun updateUserAnswer(questionId : Int, answerId : Int) {
         accountRepository.userAccount!!.answers.add(Answer(questionId, answerId))
     }
 
+    @Synchronized
     fun updatePartnerAnswer(questionId: Int, answerId : Int) {
         accountRepository.partnerAccount!!.answers.add(Answer(questionId, answerId))
     }

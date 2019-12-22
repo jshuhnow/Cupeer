@@ -1,37 +1,28 @@
 package com.example.cupid.controller.util
 
 import com.example.cupid.model.domain.NearbyPayload
-import com.example.cupid.model.observer.QueueObserver
-import com.google.android.gms.nearby.connection.Payload
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
 
 class NearbyRecvPayloadQueue {
     private val mMessageQueue = ArrayDeque<NearbyPayload>()
-    private var mObserverQueue = ArrayDeque<QueueObserver>()
-
-    private val lock = ReentrantLock()
 
     fun enqueue(nearbyPayload: NearbyPayload) {
-        lock.lock()
-        if (mObserverQueue.isNotEmpty()) {
-            mObserverQueue.poll().newElementArrived(nearbyPayload)
-        } else {
-            mMessageQueue.add(nearbyPayload)
-        }
-        lock.unlock()
+        mMessageQueue.add(nearbyPayload)
     }
 
-    fun dequeue(queueObserver: QueueObserver) : NearbyPayload? {
+    fun conditionalDequeue(filter : (NearbyPayload) -> Boolean) : NearbyPayload? {
+        val it = mMessageQueue.iterator()
         var res : NearbyPayload? = null
-        lock.lock()
-        if (mMessageQueue.isEmpty()) {
-            this.mObserverQueue.add(queueObserver)
-            res = null
-        } else {
-            res = mMessageQueue.poll()
+        while(it.hasNext()) {
+            res = it.next()
+            if ( !filter(res)  ) {
+                res = null
+            } else {
+                break
+            }
         }
-        lock.unlock()
+
+        res?.let { mMessageQueue.remove(res) }
         return res
     }
 }

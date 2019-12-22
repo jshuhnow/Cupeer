@@ -84,7 +84,7 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
     private fun setClickListeners(){
         button_result_connect.setOnClickListener{
-            controller.proceedToNextStage()
+            controller.waitForProceeding()
         }
 
         button_result_cancel.setOnClickListener{

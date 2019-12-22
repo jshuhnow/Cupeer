@@ -45,7 +45,6 @@ class ChatActivity : AppCompatActivity(), ChatView {
         constraintLayout.image_chat_heading_you.setImageResource(getAvatarFromId(this,model.getUserAccount()!!.avatarId))
 
         setClickListeners()
-
     }
 
     override fun renderMessages(msgs: ArrayList<Message>, user: Account){
@@ -85,12 +84,12 @@ class ChatActivity : AppCompatActivity(), ChatView {
     private fun setClickListeners(){
 
         button_chat_found.setOnClickListener{
-            controller.sendCue(true)
+            TODO("Not Implemented")
             controller.terminateTheConnection()
         }
 
         button_chat_close.setOnClickListener {
-            controller.sendCue(false)
+            TODO("Not Implemented")
             controller.terminateTheConnection()
         }
 
@@ -135,5 +134,14 @@ class ChatActivity : AppCompatActivity(), ChatView {
         com.example.cupid.view.utils.launchRejectedPopup(this)
     }
 
+    // This should not be called
+    override fun launchWaitingPopup() {
+        assert(false)
+    }
+
+    // This should not be called
+    override fun proceedToNextStage() {
+        assert(false)
+    }
 }
 

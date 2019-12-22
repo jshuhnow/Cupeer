@@ -1,27 +1,23 @@
 package com.example.cupid.controller
 
-import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.util.Log
+import com.example.cupid.R
 import com.example.cupid.model.DataAccessLayer
-import com.example.cupid.model.observer.QueueObserver
+import com.example.cupid.model.domain.*
 import com.example.cupid.view.ChatView
 import com.example.cupid.view.MyConnectionService
-import com.example.cupid.view.QuizResultsView
-import androidx.core.os.HandlerCompat.postDelayed
-import com.example.cupid.R
-import com.example.cupid.model.domain.*
-import com.example.cupid.view.utils.getAvatarFromId
-import com.example.cupid.view.utils.returnToMain
-import kotlinx.android.synthetic.main.activity_chat.*
 
 
 class ChatController(
     private val model : DataAccessLayer
-) : NearbyController {
+) : AbstractNearbyController() {
     private lateinit var view : ChatView
-    private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+    override val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+    override fun connectionRejected() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     companion object {
         const val TAG = "ChatController"
@@ -34,8 +30,6 @@ class ChatController(
 
     fun init() {
         updateView()
-        fetchMessage()
-
 
         if(model.inInstructionMode()){
 
@@ -63,25 +57,20 @@ class ChatController(
                     }
                 }
             }, messageDelays[0].toLong())
-
-            // TODO: the partner leaves the room either with or without the greenlight (#21)
         }
     }
 
-    fun updateView() {
-
+    private fun updateView() {
         view.renderMessages(
             model.getMessages(),
             model.getUserAccount() as Account
         )
-
-        view.clearTextView()
     }
 
-    // unless otherwise noted, the message type is MessageType.USER
-    fun addMessage(author: Account, payload: String, type : MessageType = MessageType.USER){
+    fun addMessage(author: Account, payload: String){
         model.getMessages().add(
-            Message (0, author, payload, type, arrayListOf<Account>()))
+            Message(author, payload)
+        )
         updateView()
     }
 
@@ -90,26 +79,21 @@ class ChatController(
         addMessage(message.owner, message.payload)
     }
 
-    fun sendCue(isGreenLight : Boolean) {
-        mConnectionService.send(Message(
-            model.getUserAccount()!!,
-            if (isGreenLight) SystemMessageString.GREENLIGHT else SystemMessageString.NO_GREENLIGHT,
-            MessageType.SYSTEM
-        ))
-    }
-
-    private fun processNearbyPayload(nearbyPayload : NearbyPayload) {
+    override fun processNearbyPayload(nearbyPayload : NearbyPayload) {
         when (nearbyPayload.type) {
             "Message" -> {
                 val message = nearbyPayload.obj as Message
-                addMessage(message.owner, message.payload, message.type)
-
-                // One more
-                fetchMessage()
+                addMessage(message.owner, message.payload)
             }
             "ReplyToken" -> {
                 val replyToken = nearbyPayload.obj as ReplyToken
-                processReplyToken(replyToken)
+                if (replyToken.stage <= MainController.STAGE) {
+                    if (!replyToken.isAccepted) {
+                        terminateTheConnection()
+                    }
+                } else {
+                    Log.d(MainController.TAG, "ReplyToken of unexpected stage")
+                }
             }
             else -> {
                 Log.d(MainController.TAG, "NearbyPayload of unexpected type")
@@ -119,28 +103,11 @@ class ChatController(
 
     fun terminateTheConnection() {
         mConnectionService.send(ReplyToken(false, STAGE))
-        mConnectionService.myDisconnect()
-    }
 
-    private fun fetchMessage() {
-        val nearbyPayload = mConnectionService.pullNearbyPayload(this) ?: return
-        processNearbyPayload(nearbyPayload)
-    }
-
-
-    override fun newElementArrived(nearbyPayload: NearbyPayload) {
-        processNearbyPayload(nearbyPayload)
-    }
-
-    override fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage <= MainController.STAGE) {
-            if (replyToken.isAccepted == false) {
-                terminateTheConnection()
-
-            }
-        } else {
-            Log.d(MainController.TAG, "ReplyToken of unexpected stage")
-        }
+        Handler().postDelayed(
+            { mConnectionService.myDisconnect() },
+            3000
+        )
     }
 
     override fun proceedToNextStage() {
@@ -151,5 +118,19 @@ class ChatController(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun waitForProceeding() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override val mReceivingCondition: (NearbyPayload) -> Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override fun newPayloadReceived() {
+
+    }
+
+    override fun haltPayloadReceived() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
 }

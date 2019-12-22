@@ -1,23 +1,20 @@
 package com.example.cupid.controller
 
 import android.content.Context
-import android.util.Log
 import com.example.cupid.R
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.Account
-import com.example.cupid.model.domain.Answer
 import com.example.cupid.model.domain.NearbyPayload
 import com.example.cupid.model.domain.ReplyToken
-import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MyConnectionService
 import com.example.cupid.view.QuizResultsView
 import com.example.cupid.view.utils.launchInstructionPopup
 
 class QuizResultsController(
     private val model : DataAccessLayer
-) : NearbyController {
+) : AbstractNearbyController() {
     private lateinit var view : QuizResultsView
-    private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+    override val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
 
     companion object {
         const val TAG = "QuizResultsController"
@@ -48,32 +45,32 @@ class QuizResultsController(
         mConnectionService.myDisconnect()
     }
 
-    override fun newElementArrived(nearbyPayload: NearbyPayload) {
-        if (nearbyPayload.type == "ReplyToken") {
-            processReplyToken(nearbyPayload.obj as ReplyToken)
-        }
+    override fun waitForProceeding() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage <= STAGE) {
-            if (replyToken.isAccepted) {
-                view.proceedToNextStage()
-            } else {
-                // go back
-            }
-        } else {
-            Log.d(MainController.TAG, "ReplyToken of unexpected stage")
-        }
+    override fun connectionRejected() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun processNearbyPayload(nearbyPayload: NearbyPayload) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override val mReceivingCondition: (NearbyPayload) -> Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override fun newPayloadReceived() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun haltPayloadReceived() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+
     override fun proceedToNextStage() {
         mConnectionService.send(ReplyToken(true, STAGE))
-
-        val res = mConnectionService.pullNearbyPayload(this)
-        if (res != null) {
-            val replyToken = res.obj as ReplyToken
-            processReplyToken(replyToken)
-        } else {
-            view.launchWaitingPopup()
-        }
+        view.launchWaitingPopup()
     }
 }
