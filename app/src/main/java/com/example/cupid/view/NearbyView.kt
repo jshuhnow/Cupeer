@@ -4,4 +4,5 @@ interface NearbyView {
     fun launchWaitingPopup()
     fun launchRejectedPopup()
     fun proceedToNextStage()
+    fun dismissPopups()
 }

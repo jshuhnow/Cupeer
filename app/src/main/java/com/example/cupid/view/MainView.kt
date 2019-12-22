@@ -5,7 +5,7 @@ interface MainView : NearbyView {
     fun updateGradientAnimation()
     fun launchDiscoveredPopup(partnerAvatarId: Int, partnerName : String)
 
-    fun updateClickListeners(mDiscovering : Boolean )
+    fun updateClickListeners(isSearching : Boolean )
     fun checkPermissions() : Boolean
 
     fun partnerFound(avatarId: Int, name: String)

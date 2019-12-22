@@ -9,9 +9,4 @@ interface NearbyPayloadListener {
 
     // alert the listener that a new payload has arrived
     fun newPayloadReceived()
-
-    // alert the listener that a halt payload has arrived
-    fun haltPayloadReceived()
-
-
 }

@@ -8,16 +8,14 @@ import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.*
 import com.example.cupid.view.ChatView
 import com.example.cupid.view.MyConnectionService
+import com.example.cupid.view.utils.launchRejectedPopup
 
 
 class ChatController(
     private val model : DataAccessLayer
 ) : AbstractNearbyController() {
     private lateinit var view : ChatView
-    override val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
-    override fun connectionRejected() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+
 
     companion object {
         const val TAG = "ChatController"
@@ -53,7 +51,6 @@ class ChatController(
                         addMessage(model.getPartnerAccount() as Account,messageList[messageIndex])
 
                         handler.postDelayed(this, messageDelays[++messageIndex].toLong())
-
                     }
                 }
             }, messageDelays[0].toLong())
@@ -87,8 +84,9 @@ class ChatController(
             }
             "ReplyToken" -> {
                 val replyToken = nearbyPayload.obj as ReplyToken
-                if (replyToken.stage <= MainController.STAGE) {
+                if (replyToken.stage >= STAGE) {
                     if (!replyToken.isAccepted) {
+                        view.launchRejectedPopup()
                         terminateTheConnection()
                     }
                 } else {
@@ -101,36 +99,54 @@ class ChatController(
         }
     }
 
-    fun terminateTheConnection() {
-        mConnectionService.send(ReplyToken(false, STAGE))
+    override val mReceivingCondition: (NearbyPayload) -> Boolean
+        get() = {
+            when(it.type) {
+                "Message" -> true
+                "ReplyToken" -> {
+                    val replyToken = it.obj as ReplyToken
+                    (replyToken.stage == STAGE) and (!replyToken.isAccepted)
+                }
+                else -> false
+            }
+        }
 
-        Handler().postDelayed(
-            { mConnectionService.myDisconnect() },
-            3000
-        )
+    // should not be called
+    override fun proceedToNextStage() {
+        return
     }
 
-    override fun proceedToNextStage() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun terminateTheConnection() {
+        mConnectionService.disconnect()
     }
 
     override fun rejectTheConnection() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (model.inInstructionMode()) {
+            return
+        }
+        mConnectionService.send(ReplyToken(false, STAGE))
+        // Wait until the other party receive the ReplyToken
+        Handler().postDelayed({
+            mConnectionService.disconnect()
+        }, 3000)
     }
 
     override fun waitForProceeding() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        mConnectionService.send(ReplyToken(true, STAGE))
+        view.launchWaitingPopup()
     }
 
-    override val mReceivingCondition: (NearbyPayload) -> Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override fun registerNearbyPayloadListener() {
+        super.registerNearbyPayloadListener(this)
+    }
+
+    override fun connectionRejected() {
+        view.launchRejectedPopup()
+    }
+
 
     override fun newPayloadReceived() {
-
-    }
-
-    override fun haltPayloadReceived() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        mConnectionService.conditionalPull()?.let { processNearbyPayload(it) }
     }
 
 }

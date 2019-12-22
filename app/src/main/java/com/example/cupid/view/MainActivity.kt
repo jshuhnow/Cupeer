@@ -10,6 +10,7 @@ import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
@@ -28,6 +29,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_discovered.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
 import kotlinx.android.synthetic.main.drawer_navigation_header.view.*
+import kotlin.math.log
 
 class MainActivity() :
     AppCompatActivity(),
@@ -38,7 +40,10 @@ class MainActivity() :
     private val controller = mainController()
 
     private val MULTIPLE_PERMISSIONS = 1
-    private var waitingDialog : Dialog? = null
+
+    private var mDiscoveredDialog : Dialog? = null
+    private var mWaitingDialog : Dialog? = null
+    private var mRejectedDialog : Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,21 +52,24 @@ class MainActivity() :
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
       
         checkPermissions()
+        setListeners()
 
         controller.registerClient(
             Nearby.getConnectionsClient(this)
         )
 
         controller.bind(this)
-        controller.firstInit()
         controller.init()
 
+        controller.startBackgroundThreads()
+    }
+    private fun setListeners() {
         main_button_menu.setOnClickListener {
             val myIntent = Intent(this, SettingsActivity::class.java)
             this.startActivity(myIntent)
         }
 
-        main_button_debug.setOnClickListener {
+        main_button_instruction.setOnClickListener {
             if(controller.isSearching()){
                 controller.hitDiscoverButton()
             }
@@ -85,23 +93,20 @@ class MainActivity() :
             }
 
         main_button_discover.setOnClickListener {
-            controller.init()
             controller.hitDiscoverButton()
         }
     }
-      
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         controller.updateUserInfo()
-        controller.attachListener()
+        controller.registerNearbyPayloadListener()
+        controller.reset()
     }
 
-    override fun onStop() {
-        super.onStop()
-        controller.stopAdvertising()
-        controller.detachListener()
+    override fun onPause() {
+        super.onPause()
+        controller.releaseNearbyPayloadListener()
     }
-
 
     override fun updateUserInfo(avatarId: Int, name: String) {
         nav_menu.getHeaderView(0)
@@ -124,10 +129,10 @@ class MainActivity() :
         backAnimation.start()
     }
 
-    override fun updateClickListeners(mDiscovering: Boolean) {
+    override fun updateClickListeners(isSearching: Boolean) {
         val anim = AnimationUtils.loadAnimation(this, R.anim.stripe_anim)
 
-        if (mDiscovering) {
+        if (isSearching) {
             findViewById<Button>(R.id.main_button_discover).setText(R.string.button_discover_active)
             stripe_layout.startAnimation(anim)
             findViewById<ConstraintLayout>(R.id.main_layout).setBackgroundResource(R.drawable.gradient_animation_active)
@@ -154,7 +159,7 @@ class MainActivity() :
 
 
             button_discover_connect.setOnClickListener {
-                controller.acceptTheConnection()
+                controller.waitForProceeding()
                 this.dismiss()
             }
 
@@ -176,12 +181,14 @@ class MainActivity() :
             window!!.attributes.windowAnimations = R.style.DialogAnimation
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             show()
+
+            mDiscoveredDialog = this
         }
     }
 
     override fun launchWaitingPopup() {
-        waitingDialog = Dialog(this)
-        with(waitingDialog!!) {
+        mWaitingDialog = Dialog(this)
+        with(mWaitingDialog!!) {
             setContentView(R.layout.dialog_waiting)
             this.setCancelable(false)
             if(model.inInstructionMode()){
@@ -206,14 +213,14 @@ class MainActivity() :
     }
 
     override fun launchRejectedPopup() {
-        waitingDialog?.dismiss()
-        launchRejectedPopup(this)
+        mWaitingDialog?.dismiss()
+        mRejectedDialog = launchRejectedPopup(this)
     }
 
 
     override fun proceedToNextStage() {
-        if (waitingDialog != null)
-            waitingDialog!!.dismiss()
+        if (mWaitingDialog != null)
+            mWaitingDialog!!.dismiss()
 
         val DEV = false
 
@@ -231,6 +238,12 @@ class MainActivity() :
             )
             super.startActivity(myIntent)
         }
+    }
+
+    override fun dismissPopups() {
+        mDiscoveredDialog?.dismiss()
+        mWaitingDialog?.dismiss()
+        mRejectedDialog?.dismiss()
     }
 
     override fun checkPermissions(): Boolean {
@@ -312,5 +325,9 @@ class MainActivity() :
 
     override fun onBackPressed() {
 
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dismissPopups()
     }
 }

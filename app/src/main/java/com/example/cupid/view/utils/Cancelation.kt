@@ -24,7 +24,7 @@ fun returnToMain(activity: Activity){
     activity.finish()
 }
 
-fun launchRejectedPopup(activity: Activity){
+fun launchRejectedPopup(activity: Activity) : Dialog {
     with (Dialog(activity)) {
         setContentView(R.layout.dialog_rejection)
 
@@ -45,6 +45,7 @@ fun launchRejectedPopup(activity: Activity){
         }
 
         show()
+        return this
     }
 }
 

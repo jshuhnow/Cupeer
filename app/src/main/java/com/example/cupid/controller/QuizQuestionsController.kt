@@ -12,9 +12,7 @@ import com.example.cupid.view.utils.launchInstructionPopup
 class QuizQuestionsController (
     private val model : DataAccessLayer
 ) : AbstractNearbyController() {
-    private lateinit var view : QuizQuestionsView
-
-    override val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+    private lateinit var view: QuizQuestionsView
 
     companion object {
         const val TAG = "QuizQuestionsController"
@@ -25,84 +23,105 @@ class QuizQuestionsController (
         view = quizQuestionsView
     }
 
-    fun init() {
+    fun reset() {
+        mLock.lock()
+        model.clearAnswers()
+        mLock.unlock()
+
         view.showQuestions(model.getQuestions())
 
-        if(model.inInstructionMode()){
-            launchInstructionPopup(view as Context,
-                listOf((view as Context).resources.getString(R.string.demo_text_discovered1),
-                    (view as Context).resources.getString(R.string.demo_text_discovered2)))
+        if (model.inInstructionMode()) {
+            launchInstructionPopup(
+                view as Context,
+                listOf(
+                    (view as Context).resources.getString(R.string.demo_text_discovered1),
+                    (view as Context).resources.getString(R.string.demo_text_discovered2)
+                )
+            )
         }
+    }
+
+    fun init() {
 
     }
 
-    fun chooseAnswer(questionId : Int, answerId : Int) {
+    fun chooseAnswer(questionId: Int, answerId: Int) {
         model.updateUserAnswer(questionId, answerId)
 
-        if (!model.inInstructionMode()){
+        if (!model.inInstructionMode()) {
             mConnectionService.send(Answer(questionId, answerId))
-            if (model.getUserAnswers().size >= 3) {
-                view.launchWaitingPopup()
-            }
-        }
 
+            mLock.lock()
+            if (model.getUserAnswers().size >= 3) {
+                if (model.getPartnerAnswers().size >= 3) {
+                    view.proceedToNextStage()
+                } else {
+                    view.launchWaitingPopup()
+                }
+            }
+            mLock.unlock()
+        }
     }
 
-    private fun answerArrived(answer : Answer) {
+    private fun processAnswer(answer: Answer) {
+        mLock.lock()
         model.updatePartnerAnswer(answer.questionId, answer.answerId)
+        if (model.getPartnerAnswers().size >= 3) {
+            if (model.getUserAnswers().size >=3) {
+                view.proceedToNextStage()
+            }
+        }
+        mLock.unlock()
     }
 
 
     override fun processNearbyPayload(nearbyPayload: NearbyPayload) {
-        if (nearbyPayload.type == "Answer") {
-            val answer = nearbyPayload.obj as Answer
-            answerArrived(answer)
-        } else if (nearbyPayload.type == "ReplyToken") {
-            val replyToken = nearbyPayload.obj as ReplyToken
-
-            // only accepts isAccepted
-            assert(replyToken.isAccepted)
-            view.launchWaitingPopup()
+        when(nearbyPayload.type) {
+            "Answer" -> {
+                val answer = nearbyPayload.obj as Answer
+                processAnswer(answer)
+            }
+            else -> assert(false)
         }
     }
 
     override fun proceedToNextStage() {
-        TODO("NOT IMPLEMENTED")
+        view.proceedToNextStage()
     }
 
     override fun rejectTheConnection() {
-        if(model.inInstructionMode()){
+        if (model.inInstructionMode()) {
             return
         }
-        mConnectionService.send(ReplyToken(false, MainController.STAGE))
+        mConnectionService.send(ReplyToken(false, STAGE))
         // Wait until the other party receive the ReplyToken
         Handler().postDelayed({
-            mConnectionService.myDisconnect()
+            mConnectionService.disconnect()
         }, 3000)
     }
 
     override fun waitForProceeding() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        mConnectionService.send(ReplyToken(true, STAGE))
+        view.launchWaitingPopup()
+    }
+
+    override fun registerNearbyPayloadListener() {
+        super.registerNearbyPayloadListener(this)
     }
 
     override fun connectionRejected() {
         view.launchRejectedPopup()
     }
 
-    override val mReceivingCondition: (NearbyPayload) -> Boolean
-        get() = {
-            when(it.type) {
-                "ReplyToken" -> (it.obj as ReplyToken).stage == STAGE
-                else -> false
-            }
-        }
-
     override fun newPayloadReceived() {
-        mConnectionService.conditionalPull()?.let() { processNearbyPayload(it) }
+        mConnectionService.conditionalPull()?.let { processNearbyPayload(it) }
     }
 
-    override fun haltPayloadReceived() {
-        view.launchRejectedPopup()
+    override val mReceivingCondition: (NearbyPayload) -> Boolean
+    get() = {
+        when (it.type) {
+            "Answer" -> true
+            else -> false
+        }
     }
-
 }

@@ -42,7 +42,6 @@ class QuizQuestionsActivity :
 
         controller.bind(this)
         controller.init()
-
     }
 
     override fun onCardDisappeared(view: View, position: Int) {
@@ -50,7 +49,6 @@ class QuizQuestionsActivity :
             if(model.inInstructionMode()){
                 launchWaitingPopup()
             }
-
         }
     }
 
@@ -123,8 +121,8 @@ class QuizQuestionsActivity :
     }
 
     override fun proceedToNextStage() {
-        if (waitingDialog != null)
-            waitingDialog!!.dismiss()
+        dismissPopups()
+
         val myIntent = Intent(
             this@QuizQuestionsActivity,
             QuizResultsActivity::class.java
@@ -133,7 +131,26 @@ class QuizQuestionsActivity :
         this@QuizQuestionsActivity.startActivity(myIntent)
     }
 
+    override fun dismissPopups() {
+        waitingDialog?.dismiss()
+    }
+
     override fun onBackPressed() {
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        controller.registerNearbyPayloadListener()
+        controller.reset()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        controller.releaseNearbyPayloadListener()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dismissPopups()
     }
 }

@@ -76,5 +76,10 @@ class DataAccessLayer (
         return this.instructionsMode
     }
 
+    fun clearAnswers() {
+        accountRepository.userAccount!!.answers.clear()
+        accountRepository.partnerAccount?.answers?.clear()
+    }
+
 
 }

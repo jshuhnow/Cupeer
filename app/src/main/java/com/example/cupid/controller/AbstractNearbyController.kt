@@ -11,12 +11,12 @@ abstract class AbstractNearbyController : NearbyPayloadListener {
 
     // the unique instance of 'MyConnectionService' will be lateinited
     // in the child class
-    protected abstract val mConnectionService: MyConnectionService
+    protected val mConnectionService: MyConnectionService
+        get() = MyConnectionService.getInstance()
 
     // Called when the other party has called 'rejectTheConnection'
     // or simply disconnected
     protected abstract fun connectionRejected()
-
 
     protected abstract fun processNearbyPayload(nearbyPayload: NearbyPayload)
 
@@ -29,4 +29,15 @@ abstract class AbstractNearbyController : NearbyPayloadListener {
     // Called only from the viewer; wait for the other party's cue
     abstract fun waitForProceeding()
 
+    abstract fun registerNearbyPayloadListener()
+
+    fun registerNearbyPayloadListener(nearbyPayloadListener: NearbyPayloadListener) {
+        assert(mConnectionService.getIsLocked())
+        mConnectionService.registerNearbyPayloadListener(nearbyPayloadListener)
+        mConnectionService.releaseLock()
+    }
+    fun releaseNearbyPayloadListener() {
+        mConnectionService.acquireLock()
+        mConnectionService.releaseNearbyPayloadListener()
+    }
 }

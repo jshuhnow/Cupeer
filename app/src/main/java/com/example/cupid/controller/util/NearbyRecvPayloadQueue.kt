@@ -1,28 +1,33 @@
 package com.example.cupid.controller.util
 
 import com.example.cupid.model.domain.NearbyPayload
+import com.example.cupid.model.observer.NearbyPayloadListener
 import java.util.*
 
 class NearbyRecvPayloadQueue {
     private val mMessageQueue = ArrayDeque<NearbyPayload>()
-
     fun enqueue(nearbyPayload: NearbyPayload) {
         mMessageQueue.add(nearbyPayload)
     }
 
-    fun conditionalDequeue(filter : (NearbyPayload) -> Boolean) : NearbyPayload? {
-        val it = mMessageQueue.iterator()
+    fun conditionalPull(nearbyPayloadListener: NearbyPayloadListener) : NearbyPayload? {
         var res : NearbyPayload? = null
+
+        val it: Iterator<NearbyPayload> = mMessageQueue.iterator()
         while(it.hasNext()) {
-            res = it.next()
-            if ( !filter(res)  ) {
-                res = null
-            } else {
+            val current = it.next()
+            if (nearbyPayloadListener.mReceivingCondition(current)) {
+                res = current
+
+                mMessageQueue.remove(current)
                 break
             }
         }
 
-        res?.let { mMessageQueue.remove(res) }
         return res
+    }
+
+    fun clear() {
+        mMessageQueue.clear()
     }
 }

@@ -2,29 +2,135 @@ package com.example.cupid.controller
 
 import android.content.Context
 import android.os.Handler
-import android.os.Parcelable
 import android.util.Log
 import com.example.cupid.R
 
-import com.example.cupid.controller.util.ParcelableUtil
 import com.example.cupid.model.DataAccessLayer
 import com.example.cupid.model.domain.*
+import com.example.cupid.model.observer.NearbyEndpointListener
 
-import com.example.cupid.model.observer.NearbyNewPartnerFoundObserver
-import com.example.cupid.model.observer.QueueObserver
 import com.example.cupid.view.MainView
 import com.example.cupid.view.MyConnectionService
 import com.example.cupid.view.utils.launchInstructionPopup
 import com.google.android.gms.nearby.connection.ConnectionsClient
-import com.google.android.gms.nearby.connection.Payload
 
 class MainController(private val model: DataAccessLayer)
-    : NearbyNewPartnerFoundObserver, NearbyController {
-    private lateinit var view:MainView
-    private var mDiscovering = false
-    private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+    : AbstractNearbyController(), NearbyEndpointListener  {
+    private lateinit var view : MainView
+    private var mLocalIsSearching = false
+    private var mHasAccepted = false
 
-    private var demoPopup = false
+    // called only once
+    fun init() {
+        view.checkPermissions()
+
+        dataSetup()
+        view.updateGradientAnimation()
+
+        // onStart() in MainActivity should start with the lock acquired
+        mConnectionService.acquireLock()
+    }
+
+    // called whenever coming back to Main
+    fun reset() {
+        updateUserInfo()
+        view.updateClickListeners(false)
+        model.setInstructionMode(false)
+        mConnectionService.setNearbyEndpointListener(this)
+        mLocalIsSearching = false
+        mHasAccepted = false
+    }
+
+    fun startBackgroundThreads() {
+        mConnectionService.startBackgroundThreads()
+    }
+
+    // should be called with the lock acquired
+    override fun registerNearbyPayloadListener() {
+        super.registerNearbyPayloadListener(this)
+    }
+
+    fun isSearching() : Boolean {
+        return mLocalIsSearching
+    }
+
+
+    override fun proceedToNextStage() {
+        view.proceedToNextStage()
+    }
+
+    override fun rejectTheConnection() {
+        if (model.inInstructionMode()) {
+            return
+        }
+        mConnectionService.send(ReplyToken(false, STAGE))
+        // Wait until the other party receive the ReplyToken
+        Handler().postDelayed({
+            mConnectionService.disconnect()
+        }, 3000)
+    }
+
+    override fun waitForProceeding() {
+        view.launchWaitingPopup()
+        mHasAccepted = true
+        mConnectionService.conditionalPull()?.let { processNearbyPayload(it) }
+
+        if(model.inInstructionMode()){
+            return
+        }
+
+        mConnectionService.send(ReplyToken(true, STAGE))
+    }
+
+    override fun connectionRejected() {
+        view.launchRejectedPopup()
+    }
+    private fun processReplyToken(replyToken : ReplyToken) {
+        if (replyToken.stage == STAGE) {
+            if (replyToken.isAccepted) {
+                view.proceedToNextStage()
+            } else {
+                view.launchRejectedPopup()
+            }
+        } else {
+            Log.d(TAG, "ReplyToken of unexpected stage")
+        }
+    }
+
+    override fun processNearbyPayload(nearbyPayload: NearbyPayload) {
+        when (nearbyPayload.type) {
+            "Account" -> {
+                val account = nearbyPayload.obj as Account
+                partnerInfoArrived(account.avatarId, account.name)
+            }
+            "ReplyToken" -> {
+                val replyToken = nearbyPayload.obj as ReplyToken
+                processReplyToken(replyToken)
+            }
+            else -> {
+                Log.d(TAG, "NearbyPayload of unexpected type")
+            }
+        }
+    }
+
+    override fun newPayloadReceived() {
+        mConnectionService.conditionalPull()?.let { processNearbyPayload(it) }
+    }
+
+    override val mReceivingCondition: (NearbyPayload) -> Boolean
+        get() = {
+            when (it.type) {
+                "Account" -> true
+                "ReplyToken" -> {
+                    val replyToken = it.obj as ReplyToken
+                    mHasAccepted || !replyToken.isAccepted
+
+                }
+                else -> false
+            }
+        }
+
+    private var mDemoPopup = false
 
     companion object {
         const val TAG = "MainController"
@@ -33,36 +139,11 @@ class MainController(private val model: DataAccessLayer)
 
     fun bind(mainView : MainView) {
         view = mainView
-
     }
 
     fun registerClient(connectionsClient: ConnectionsClient) {
         MyConnectionService.getInstance()
             .setConnectionsClient(connectionsClient)
-    }
-
-    fun startAdvertising() {
-        mConnectionService
-            .registerNearbyNewPartnerFoundObserver(this)
-        mConnectionService.startAdvertising()
-    }
-
-    fun stopAdvertising() {
-        mConnectionService.stopAdvertising()
-        mConnectionService
-            .unregisterNearbyNewPartnerFoundObserver()
-    }
-
-    fun startDiscovering() {
-        mConnectionService.startDiscovering()
-    }
-
-    fun stopDiscovering() {
-        mConnectionService.stopDiscovering()
-    }
-
-    fun isDiscovering() : Boolean{
-        return mDiscovering
     }
 
     private fun dataSetup() {
@@ -100,121 +181,37 @@ class MainController(private val model: DataAccessLayer)
         view.updateUserInfo(model.getUserAccount()!!.avatarId, model.getUserAccount()!!.name)
     }
 
-    fun init() {
-        view.checkPermissions()
-
-        dataSetup()
-        updateUserInfo()
-        view.updateGradientAnimation()
-        view.updateClickListeners(mDiscovering)
-        model.setInstructionMode(false)
-    }
-
     fun hitDiscoverButton() {
-        mDiscovering = !mDiscovering
-        view.updateClickListeners(mDiscovering)
+        mLocalIsSearching = !mLocalIsSearching
+        view.updateClickListeners(mLocalIsSearching)
 
-        if (mDiscovering) {
-
+        if (mLocalIsSearching) {
             if(model.inInstructionMode()){
-                if(!demoPopup){
-                    demoPopup = true
+                if(!mDemoPopup){
+                    mDemoPopup = true
                     Handler().postDelayed({
-                        if(mDiscovering){
+                        if(mLocalIsSearching){
                             view.launchDiscoveredPopup(
                                 model.getPartnerAccount()!!.avatarId, model.getPartnerAccount()!!.name)
                         }
-                        demoPopup = false
+                        mDemoPopup = false
 
                     }, 3000)
                 }
                 return
             }else{
-                startAdvertising()
-                startDiscovering()
+                mConnectionService.startSearching()
             }
 
         } else {
             if(model.inInstructionMode()){return}
-            stopAdvertising()
-            stopDiscovering()
-        }
-
-
-    }
-
-    fun acceptTheConnection() {
-
-        if(model.inInstructionMode()){
-            view.launchWaitingPopup()
-            return
-        }
-
-
-        mConnectionService.send(ReplyToken(true, STAGE))
-        val res = mConnectionService.pullNearbyPayload(this)
-        if (res != null) {
-            val replyToken = res.obj as ReplyToken
-            processReplyToken(replyToken)
-        } else {
-            view.launchWaitingPopup()
+            mConnectionService.stopSearching()
         }
     }
 
-    override fun rejectTheConnection() {
-
-        if(model.inInstructionMode()){
-            return
-        }
-
-        mConnectionService.send(ReplyToken(false, STAGE))
-        mConnectionService.myDisconnect()
-    }
-
-    override fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage == STAGE) {
-            if (replyToken.isAccepted) {
-                proceedToNextStage()
-            } else {
-
-            }
-        } else {
-            Log.d(TAG, "ReplyToken of unexpected stage")
-        }
-    }
-
-    override fun proceedToNextStage() {
-        view.proceedToNextStage()
-    }
-
-    override fun newPartnerfound() {
-
-        mConnectionService.send(model.getUserAccount()!!)
-
-        val res = mConnectionService.pullNearbyPayload(this)
-        if (res != null) {
-            val account = res.obj as Account
-            partnerInfoArrived(account.avatarId, account.name)
-        }
-    }
-
-
-    override fun newElementArrived(nearbyPayload: NearbyPayload) {
-        if (nearbyPayload.type == "Account") {
-            val account = nearbyPayload.obj as Account
-            partnerInfoArrived(account.avatarId, account.name)
-        } else if (nearbyPayload.type == "ReplyToken") {
-            val replyToken = nearbyPayload.obj as ReplyToken
-            processReplyToken(replyToken)
-        } else {
-            Log.d(TAG, "NearbyPayload of unexpected type")
-        }
-
-    }
-
-    fun partnerInfoArrived(avartarId : Int, name : String) {
-        model.updatePartnerAccount(avartarId, name)
-        view.partnerFound(avartarId, name)
+    private fun partnerInfoArrived(avatarId : Int, name : String) {
+        model.updatePartnerAccount(avatarId, name)
+        view.partnerFound(avatarId, name)
     }
 
     fun fillInstructionData(){
@@ -233,5 +230,12 @@ class MainController(private val model: DataAccessLayer)
                 (view as Context).resources.getString(R.string.demo_text_greeting4)))
     }
 
+    override fun onEndpointConnected() {
+        mConnectionService.stopSearching()
+        mConnectionService.send(model.getUserAccount()!!)
+    }
 
+    override fun onEndpointDisconnected(endpoint: Endpoint?) {
+        view.dismissPopups()
+    }
 }
