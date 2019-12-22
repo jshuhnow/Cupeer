@@ -33,9 +33,7 @@ class MyConnectionService
     @Volatile private var mIsSearching = false
 
     fun startBackgroundThreads() {
-        Thread {
-            searching()
-        }.start()
+        searching.start()
     }
     fun getIsLocked() : Boolean {
         return mLock.isLocked
@@ -104,10 +102,11 @@ class MyConnectionService
         return res
     }
 
-    private fun searching() {
+    private val searching = Thread {
         val r = Random()
 
         while(true) {
+            Log.i("SEARCHING", "1")
             mLock.lock()
             if (mIsSearching) {
                 startDiscovering()
@@ -116,6 +115,7 @@ class MyConnectionService
 
             Thread.sleep(r.nextInt(4000).toLong()+ 4000)
 
+            Log.i("SEARCHING", "2")
             mLock.lock()
             if (mIsSearching) {
                 startAdvertising()
