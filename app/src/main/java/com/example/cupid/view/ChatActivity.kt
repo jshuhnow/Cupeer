@@ -1,5 +1,6 @@
 package com.example.cupid.view
 
+import android.app.Dialog
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,9 +19,8 @@ import kotlinx.android.synthetic.main.activity_chat.*
 import com.example.cupid.view.utils.returnToMain
 import com.example.cupid.view.views.ChatView
 import kotlinx.android.synthetic.main.activity_chat.view.*
-
-
-
+import com.example.cupid.controller.ControllerModule.chatController
+import com.example.cupid.view.utils.launchRejectedPopup
 
 
 //TODO deal with cancelation on partners side -> launchRejectedPopup
@@ -31,8 +31,9 @@ class ChatActivity : AppCompatActivity(), ChatView {
     private var messageAdapter: ChatMessageListAdapter? = null
     private var layoutManager : RecyclerView.LayoutManager? = null
 
+    private var mRejectedDialog : Dialog? = null
     private val model = ModelModule.dataAccessLayer
-    private val controller = ChatController(model)
+    private val controller = chatController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,12 +47,10 @@ class ChatActivity : AppCompatActivity(), ChatView {
         constraintLayout.image_chat_heading_you.setImageResource(getAvatarFromId(this,model.getUserAccount()!!.avatarId))
 
         setClickListeners()
-
     }
 
     override fun renderMessages(msgs: ArrayList<Message>, user: Account){
-
-        var messages: ArrayList<MessageUI> = arrayListOf()
+        val messages: ArrayList<MessageUI> = arrayListOf()
 
         for (msg in msgs) {
             messages.add(MessageUI (
@@ -85,12 +84,13 @@ class ChatActivity : AppCompatActivity(), ChatView {
     private fun setClickListeners(){
 
         button_chat_found.setOnClickListener{
-            returnToMain(this)
+            controller.terminateTheConnection()
+            returnToMain()
         }
 
         button_chat_close.setOnClickListener {
-            // TODO send the other person the "rejection" message
-            returnToMain(this)
+            controller.rejectTheConnection()
+            returnToMain()
         }
 
         button_chatbox_send.setOnClickListener{
@@ -102,6 +102,7 @@ class ChatActivity : AppCompatActivity(), ChatView {
 
             if (payload != ""){
                 controller.sendMessage(Message(model.getUserAccount()!!, payload))
+                clearTextView()
 
                 val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
@@ -126,5 +127,36 @@ class ChatActivity : AppCompatActivity(), ChatView {
 
     }
 
+    override fun returnToMain() {
+        returnToMain(this)
+    }
+
+    override fun launchRejectedPopup() {
+        mRejectedDialog = launchRejectedPopup(this)
+    }
+
+    // This should not be called
+    override fun launchWaitingPopup() {
+        assert(false)
+    }
+
+    // This should not be called
+    override fun proceedToNextStage() {
+        assert(false)
+    }
+
+    override fun dismissPopups() {
+        mRejectedDialog?.dismiss()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        controller.registerNearbyPayloadListener()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        controller.releaseNearbyPayloadListener()
+    }
 }
 

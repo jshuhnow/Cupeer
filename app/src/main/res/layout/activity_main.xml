@@ -88,7 +88,7 @@
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/main_button_debug"
+            android:id="@+id/main_button_instruction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#00ACC1"
@@ -125,7 +125,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/main_button_debug" />
+            app:layout_constraintTop_toBottomOf="@+id/main_button_instruction" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -138,7 +138,7 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/drawer_navigation_header"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/main_button_debug"
+        app:layout_constraintEnd_toStartOf="@+id/main_button_instruction"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/activity_menu_drawer"

@@ -15,7 +15,6 @@ class AboutActivity : AppCompatActivity() {
     }
 
     private fun setClickListeners() {
-
         button_about_close.setOnClickListener {
             finish()
         }

@@ -19,6 +19,7 @@ import com.example.cupid.view.views.QuizQuestionsView
 import com.yuyakaido.android.cardstackview.*
 import kotlinx.android.synthetic.main.activity_quiz_questions.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
+import com.example.cupid.controller.ControllerModule.quizQuestionsController
 
 class QuizQuestionsActivity :
     AppCompatActivity(),
@@ -26,7 +27,7 @@ class QuizQuestionsActivity :
     QuizQuestionsView
 {
     private val model = ModelModule.dataAccessLayer
-    private val controller = QuizQuestionsController(model)
+    private val controller = quizQuestionsController()
 
     private var questionCardStackAdapter : QuestionCardStackAdapter? = null
     private var layoutManager : CardStackLayoutManager? = null
@@ -42,7 +43,6 @@ class QuizQuestionsActivity :
 
         controller.bind(this)
         controller.init()
-
     }
 
     override fun onCardDisappeared(view: View, position: Int) {
@@ -50,7 +50,6 @@ class QuizQuestionsActivity :
             if(model.inInstructionMode()){
                 launchWaitingPopup()
             }
-
         }
     }
 
@@ -76,6 +75,10 @@ class QuizQuestionsActivity :
             window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             show()
         }
+    }
+
+    override fun launchRejectedPopup() {
+        com.example.cupid.view.utils.launchRejectedPopup(this)
     }
 
     override fun onCardDragging(direction: Direction, ratio: Float) {}
@@ -119,8 +122,8 @@ class QuizQuestionsActivity :
     }
 
     override fun proceedToNextStage() {
-        if (waitingDialog != null)
-            waitingDialog!!.dismiss()
+        dismissPopups()
+
         val myIntent = Intent(
             this@QuizQuestionsActivity,
             QuizResultsActivity::class.java
@@ -129,7 +132,26 @@ class QuizQuestionsActivity :
         this@QuizQuestionsActivity.startActivity(myIntent)
     }
 
+    override fun dismissPopups() {
+        waitingDialog?.dismiss()
+    }
+
     override fun onBackPressed() {
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        controller.registerNearbyPayloadListener()
+        controller.reset()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        controller.releaseNearbyPayloadListener()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dismissPopups()
     }
 }

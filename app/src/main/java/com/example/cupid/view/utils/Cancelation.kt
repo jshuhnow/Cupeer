@@ -21,39 +21,43 @@ fun returnToMain(activity: Activity){
     val model = ModelModule.dataAccessLayer
 
     val intents = Intent(activity, MainActivity::class.java)
+
+
     intents.addFlags(
         Intent.FLAG_ACTIVITY_NEW_TASK
                 or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                or Intent.FLAG_ACTIVITY_CLEAR_TASK
+             or Intent.FLAG_ACTIVITY_CLEAR_TASK
     )
+
     model.reset()
     Log.d("Test", model.getMessages().toString())
     activity.startActivity(intents)
     activity.finish()
 }
 
-fun launchRejectedPopup(activity: Activity){
-    val rejectionDialog = Dialog(activity)
-    rejectionDialog.setContentView(R.layout.dialog_rejection)
+fun launchRejectedPopup(activity: Activity) : Dialog {
+    with (Dialog(activity)) {
+        setContentView(R.layout.dialog_rejection)
+
+        button_rejection_close.setOnClickListener{
+            dismiss()
+        }
 
 
-    rejectionDialog.button_rejection_close.setOnClickListener{
-        rejectionDialog.dismiss()
+        window!!.attributes.windowAnimations = R.style.DialogAnimation
+        window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        setOnDismissListener{
+            returnToMain(activity)
+        }
+
+        setOnCancelListener{
+            returnToMain(activity)
+        }
+
+        show()
+        return this
     }
-
-
-    rejectionDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-    rejectionDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-    rejectionDialog.setOnDismissListener{
-        returnToMain(activity)
-    }
-
-    rejectionDialog.setOnCancelListener{
-        returnToMain(activity)
-    }
-
-    rejectionDialog.show()
 }
 
 fun launchInstructionPopup(context: Context, strings: List<String>){

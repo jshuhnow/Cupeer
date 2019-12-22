@@ -3,22 +3,21 @@ package com.example.cupid.controller
 import android.content.Context
 import android.os.Handler
 import android.util.Log
+import com.example.cupid.R
 import com.example.cupid.model.DataAccessLayer
+import com.example.cupid.model.domain.*
+import com.example.cupid.view.views.ChatView
 import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Message
 import com.example.cupid.model.domain.NearbyPayload
 import com.example.cupid.model.domain.ReplyToken
-import com.example.cupid.model.observer.QueueObserver
-import com.example.cupid.view.views.ChatView
-import com.example.cupid.view.MyConnectionService
-import com.example.cupid.R
 
 
 class ChatController(
     private val model : DataAccessLayer
-) : QueueObserver {
+) : AbstractNearbyController() {
     private lateinit var view : ChatView
-    private val mConnectionService: MyConnectionService = MyConnectionService.getInstance()
+
 
     companion object {
         const val TAG = "ChatController"
@@ -31,8 +30,6 @@ class ChatController(
 
     fun init() {
         updateView()
-        fetchMessage()
-
 
         if(model.inInstructionMode()){
 
@@ -56,26 +53,23 @@ class ChatController(
                         addMessage(model.getPartnerAccount() as Account,messageList[messageIndex])
 
                         handler.postDelayed(this, messageDelays[++messageIndex].toLong())
-
                     }
                 }
             }, messageDelays[0].toLong())
-
-
         }
     }
 
-    fun updateView() {
+    private fun updateView() {
         view.renderMessages(
-            model.getMessages() as ArrayList<Message>,
+            model.getMessages(),
             model.getUserAccount() as Account
         )
-
-        view.clearTextView()
     }
+
     fun addMessage(author: Account, payload: String){
         model.getMessages().add(
-            Message (0, author, payload, arrayListOf<Account>()))
+            Message(author, payload)
+        )
         updateView()
     }
 
@@ -84,56 +78,77 @@ class ChatController(
         addMessage(message.owner, message.payload)
     }
 
-    fun rejectTheConnection() {
-        mConnectionService.send(ReplyToken(false, STAGE))
-        mConnectionService.myDisconnect()
-        //TODO view.goback()
+    override fun processNearbyPayload(nearbyPayload : NearbyPayload) {
+        when (nearbyPayload.type) {
+            "Message" -> {
+                val message = nearbyPayload.obj as Message
+                addMessage(message.owner, message.payload)
+            }
+            "ReplyToken" -> {
+                val replyToken = nearbyPayload.obj as ReplyToken
+                if (replyToken.stage >= STAGE) {
+                    if (!replyToken.isAccepted) {
+                        view.launchRejectedPopup()
+                        terminateTheConnection()
+                    }
+                } else {
+                    Log.d(MainController.TAG, "ReplyToken of unexpected stage")
+                }
+            }
+            else -> {
+                Log.d(MainController.TAG, "NearbyPayload of unexpected type")
+            }
+        }
     }
 
-    fun fetchMessage() {
-        val res = mConnectionService.pullNearbyPayload(this)
-        if (res == null) {
+    override val mReceivingCondition: (NearbyPayload) -> Boolean
+        get() = {
+            when(it.type) {
+                "Message" -> true
+                "ReplyToken" -> {
+                    val replyToken = it.obj as ReplyToken
+                    (replyToken.stage == STAGE) and (!replyToken.isAccepted)
+                }
+                else -> false
+            }
+        }
+
+    // should not be called
+    override fun proceedToNextStage() {
+        return
+    }
+
+    fun terminateTheConnection() {
+        mConnectionService.disconnect()
+    }
+
+    override fun rejectTheConnection() {
+        if (model.inInstructionMode()) {
             return
         }
-
-        if (res.type == "Message") {
-            val message = res.obj as Message
-            addMessage(message.owner, message.payload)
-
-            // One more
-            fetchMessage()
-        } else if (res.type == "ReplyToken") {
-            val replyToken = res.obj as ReplyToken
-            processReplyToken(replyToken)
-        } else {
-            Log.d(MainController.TAG, "NearbyPayload of unexpected type")
-        }
+        mConnectionService.send(ReplyToken(false, STAGE))
+        // Wait until the other party receive the ReplyToken
+        Handler().postDelayed({
+            mConnectionService.disconnect()
+        }, 3000)
     }
 
-    override fun newElementArrived(nearbyPayload: NearbyPayload) {
-        if (nearbyPayload.type == "Message") {
-            val message = nearbyPayload.obj as Message
-            addMessage(message.owner, message.payload)
-
-            // One more
-            fetchMessage()
-        } else if (nearbyPayload.type == "ReplyToken") {
-            val replyToken = nearbyPayload.obj as ReplyToken
-            processReplyToken(replyToken)
-        } else {
-            Log.d(MainController.TAG, "NearbyPayload of unexpected type")
-        }
-
+    override fun waitForProceeding() {
+        mConnectionService.send(ReplyToken(true, STAGE))
+        view.launchWaitingPopup()
     }
 
-    fun processReplyToken(replyToken : ReplyToken) {
-        if (replyToken.stage == MainController.STAGE) {
-            if (replyToken.isAccepted == false) {
-                rejectTheConnection()
-            }
-        } else {
-            Log.d(MainController.TAG, "ReplyToken of unexpected stage")
-        }
+    override fun registerNearbyPayloadListener() {
+        super.registerNearbyPayloadListener(this)
+    }
+
+    override fun connectionRejected() {
+        view.launchRejectedPopup()
+    }
+
+
+    override fun newPayloadReceived() {
+        mConnectionService.conditionalPull()?.let { processNearbyPayload(it) }
     }
 
 }

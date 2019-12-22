@@ -19,10 +19,12 @@ import com.example.cupid.model.domain.Answer
 import com.example.cupid.model.domain.Question
 import com.example.cupid.view.adapters.ResultListAdapter
 import com.example.cupid.view.data.ResultUI
+
 import com.example.cupid.view.utils.returnToMain
-import com.example.cupid.view.views.QuizResultsView
 import kotlinx.android.synthetic.main.activity_quiz_results.*
 import kotlinx.android.synthetic.main.dialog_waiting.*
+import com.example.cupid.controller.ControllerModule.quizResultsController
+import com.example.cupid.view.views.QuizResultsView
 
 class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
@@ -31,7 +33,7 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
     private var resultRecyclerView : RecyclerView? = null
 
     private var model : DataAccessLayer = ModelModule.dataAccessLayer
-    private var controller : QuizResultsController = QuizResultsController(model)
+    private var controller : QuizResultsController = quizResultsController()
 
     private var waitingDialog : Dialog? = null
 
@@ -40,10 +42,11 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
         setContentView(R.layout.activity_quiz_results)
         window.decorView.systemUiVisibility= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
+        setClickListeners()
+
         controller.bind(this)
         controller.init()
 
-        setClickListeners()
     }
 
     override fun renderAnswers(questions : ArrayList<Question>?,
@@ -83,7 +86,7 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
 
     private fun setClickListeners(){
         button_result_connect.setOnClickListener{
-            controller.proceedToNextStage()
+            controller.waitForProceeding()
         }
 
         button_result_cancel.setOnClickListener{
@@ -122,16 +125,38 @@ class QuizResultsActivity : AppCompatActivity(), QuizResultsView {
         waitingDialog!!.show()
     }
 
+    override fun launchRejectedPopup() {
+        com.example.cupid.view.utils.launchRejectedPopup(this)
+    }
+
     override fun proceedToNextStage() {
-        if (waitingDialog != null) {
-            waitingDialog!!.dismiss()
-        }
+        dismissPopups()
         val myIntent = Intent(this, ChatActivity::class.java)
         this.startActivity(myIntent)
 
     }
 
+    override fun dismissPopups() {
+        waitingDialog?.dismiss()
+    }
+
     override fun onBackPressed() {
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        controller.registerNearbyPayloadListener()
+        controller.reset()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        controller.releaseNearbyPayloadListener()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dismissPopups()
     }
 }

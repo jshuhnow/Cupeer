@@ -4,7 +4,7 @@ import com.example.cupid.model.domain.Account
 import com.example.cupid.model.domain.Answer
 import com.example.cupid.model.domain.Question
 
-interface QuizResultsView {
+interface QuizResultsView : NearbyView {
     fun renderAnswers(questions : ArrayList<Question>?,
                       myAccount: Account,
                       myAnswer : ArrayList<Answer>?,
@@ -12,6 +12,4 @@ interface QuizResultsView {
                       partnerAnswer : ArrayList<Answer>?) {
 
     }
-    fun launchWaitingPopup()
-    fun proceedToNextStage()
 }

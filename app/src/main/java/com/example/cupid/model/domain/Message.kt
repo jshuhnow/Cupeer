@@ -5,13 +5,13 @@ import kotlinx.android.parcel.Parcelize
 import java.lang.reflect.Constructor
 import java.security.acl.Owner
 
+
 @Parcelize
 data class Message (
     val createdTime : Long = 0,
     val owner : Account,
-    val payload : String,
-    val readyBy : ArrayList<Account>
+    val payload : String
 ) : Parcelable {
     constructor(owner : Account, payload: String) :
-            this(System.currentTimeMillis(), owner, payload, ArrayList<Account>())
+            this(System.currentTimeMillis(), owner, payload)
 }

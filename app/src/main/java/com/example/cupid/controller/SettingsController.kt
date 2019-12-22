@@ -16,8 +16,8 @@ class SettingsController(
         return Pair(model.getUserAccount()!!.avatarId, model.getUserAccount()!!.name)
     }
 
-    fun writeUserInformation(avartarId : Int, name : String) {
-        model.getUserAccount()!!.avatarId = avartarId
+    fun writeUserInformation(avatarId : Int, name : String) {
+        model.getUserAccount()!!.avatarId = avatarId
         model.getUserAccount()!!.name = name
     }
 }

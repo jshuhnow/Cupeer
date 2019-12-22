@@ -14,7 +14,7 @@ import com.example.cupid.view.utils.getAvatarFromId
 import android.widget.TextView
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.example.cupid.controller.SettingsController
+import com.example.cupid.controller.ControllerModule.settingsController
 import com.example.cupid.model.ModelModule
 import com.example.cupid.view.views.SettingsView
 
@@ -24,7 +24,7 @@ class SettingsActivity :
     SettingsView {
 
     private val model = ModelModule.dataAccessLayer
-    private val controller = SettingsController(model)
+    private val controller = settingsController()
 
     private var mName : String = ""
     private var mIconId : Int = 0
