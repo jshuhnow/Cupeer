@@ -152,6 +152,7 @@ class ChatActivity : AppCompatActivity(), ChatView {
     override fun onResume() {
         super.onResume()
         controller.registerNearbyPayloadListener()
+        controller.reset()
     }
 
     override fun onPause() {

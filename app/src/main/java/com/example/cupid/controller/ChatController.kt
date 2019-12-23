@@ -59,6 +59,21 @@ class ChatController(
         }
     }
 
+    fun reset() {
+        updateView()
+        for (i in 0..10) {
+            var isReceived = false
+            mConnectionService.conditionalPull()?.let {
+                var res = processNearbyPayload(it)
+                if (res != null) {
+                    isReceived =true
+                }
+
+            }
+            if (!isReceived) break
+        }
+    }
+
     private fun updateView() {
         view.renderMessages(
             model.getMessages(),

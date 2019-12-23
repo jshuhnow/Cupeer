@@ -41,6 +41,18 @@ class MainController(private val model: DataAccessLayer)
         mConnectionService.setNearbyEndpointListener(this)
         mLocalIsSearching = false
         mHasAccepted = false
+
+        for (i in 0..10) {
+            var isReceived = false
+            mConnectionService.conditionalPull()?.let {
+                var res = processNearbyPayload(it)
+                if (res != null) {
+                    isReceived =true
+                }
+
+            }
+            if (!isReceived) break
+        }
     }
 
     fun startBackgroundThreads() {
@@ -171,7 +183,7 @@ class MainController(private val model: DataAccessLayer)
 
         if (mLocalIsSearching) {
             if(model.inInstructionMode()){
-                fillDummyParnterData()
+                fillDummyPartnerData()
                 if(!mDemoPopup){
                     mDemoPopup = true
                     Handler().postDelayed({
@@ -218,7 +230,7 @@ class MainController(private val model: DataAccessLayer)
         view.dismissPopups()
     }
 
-    private fun fillDummyParnterData() {
+    private fun fillDummyPartnerData() {
         model.updatePartnerAccount(11,"Cupee")
     }
 }

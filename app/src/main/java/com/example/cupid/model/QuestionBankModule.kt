@@ -30,7 +30,9 @@ object QuestionBankModule {
                     "Close the lid without a word.",
                     "Shake hands with it.",
                     ""
-                )),
+                ))
+/*
+            ,
 
             Pair("Are you often late for school or meetings?",
                 arrayListOf(
@@ -87,6 +89,7 @@ object QuestionBankModule {
                     "Ignore it.",
                     ""
                 ))
+                */
         )
 
 
