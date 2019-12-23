@@ -171,6 +171,7 @@ class MainController(private val model: DataAccessLayer)
 
         if (mLocalIsSearching) {
             if(model.inInstructionMode()){
+                fillDummyParnterData()
                 if(!mDemoPopup){
                     mDemoPopup = true
                     Handler().postDelayed({
@@ -198,12 +199,6 @@ class MainController(private val model: DataAccessLayer)
         view.partnerFound(avatarId, name)
     }
 
-    fun fillInstructionData(){
-        model.updatePartnerAccount(11,"Cupee")
-        model.updatePartnerAnswer(0, 0)
-        model.updatePartnerAnswer(1, 0)
-        model.updatePartnerAnswer(2, 0)
-    }
 
     fun startInstructionDialog(){
         model.setInstructionMode(true)
@@ -221,5 +216,9 @@ class MainController(private val model: DataAccessLayer)
 
     override fun onEndpointDisconnected(endpoint: Endpoint?) {
         view.dismissPopups()
+    }
+
+    private fun fillDummyParnterData() {
+        model.updatePartnerAccount(11,"Cupee")
     }
 }

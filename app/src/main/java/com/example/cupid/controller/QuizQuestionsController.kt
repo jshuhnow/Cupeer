@@ -26,6 +26,10 @@ class QuizQuestionsController (
     fun reset() {
         mLock.lock()
         model.clearAnswers()
+
+        if (model.inInstructionMode()) {
+            fillDummyPartnerAnswers()
+        }
         mLock.unlock()
 
         view.showQuestions(model.getQuestions())
@@ -63,6 +67,12 @@ class QuizQuestionsController (
         }
     }
 
+    private fun fillDummyPartnerAnswers() {
+        model.updatePartnerAnswer(0, 0)
+        model.updatePartnerAnswer(1, 0)
+        model.updatePartnerAnswer(2, 0)
+
+    }
     private fun processAnswer(answer: Answer) {
         mLock.lock()
         model.updatePartnerAnswer(answer.questionId, answer.answerId)

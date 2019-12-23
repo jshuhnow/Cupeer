@@ -74,7 +74,6 @@ class MainActivity() :
             if(controller.isSearching()){
                 controller.hitDiscoverButton()
             }
-            controller.fillInstructionData()
             controller.startInstructionDialog()
 
         }
@@ -337,4 +336,6 @@ class MainActivity() :
         super.onDestroy()
         dismissPopups()
     }
+
+
 }
